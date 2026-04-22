@@ -25,6 +25,7 @@ variable "isis_nodes" {
     net_address = string
     iface_name  = string    # ge-0/0/1 (eth2)
     iface_ip    = string    # 10.1.1.x/30
+    lo0_ip      = string
     }))
   default = {
     "EDGE-A" = {
@@ -32,12 +33,14 @@ variable "isis_nodes" {
       net_address = "49.0001.0000.0000.00ea.00"
       iface_name  = "ge-0/0/1"
       iface_ip    = "10.1.1.1/30"
+      lo0_ip      = "10.50.50.30/32"
     }
     "EDGE-B" = {
       mgmt_ip     = "172.50.50.40"
       net_address = "49.0001.0000.0000.00eb.00"
       iface_name  = "ge-0/0/1"
       iface_ip    = "10.1.1.2/30"
+      lo0_ip      = "10.50.50.40/32"
     }
   }
 }
