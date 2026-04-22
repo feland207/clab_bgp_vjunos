@@ -34,7 +34,7 @@ resource "junos_interface_logical" "loopback_v4_iso" {
 
 # Protocols and NET Address via File; Fetch the file based on the active workspace
 resource "junos_commit_file" "isis_config" {
-  # This dynamically looks for base_edge_a.txt or base_edge_b.txt
+  # This dynamically looks for base_edge-a.txt or base_edge-b.txt
   # depending on if the workspace is named 'edge-a' or 'edge-b'
   filename = "${path.module}/../templates/isis/base_${terraform.workspace}.txt"
 }

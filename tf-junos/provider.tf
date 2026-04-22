@@ -3,7 +3,7 @@ terraform {
   required_providers {
     junos = {
       source  = "jeremmfr/junos"
-      version = "~> 1.62.0"
+      version = "~> 2.18.0" # Updated to the correct major version
     }
   }
 }
