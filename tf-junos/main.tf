@@ -1,5 +1,5 @@
 locals {
-  # Filters the map to find the entry matching the current mgmt_ip
+  # Identifies the node name based on the mgmt_ip passed at CLI
   current_node_name = [for k, v in var.isis_nodes : k if v.mgmt_ip == var.mgmt_ip][0]
   node              = var.isis_nodes[local.current_node_name]
 }
@@ -32,9 +32,16 @@ resource "junos_interface_logical" "loopback_v4_iso" {
   family_iso {} # Enables ISO processing for the NET address
 }
 
-# Protocols and NET Address via File; Fetch the file based on the active workspace
-resource "junos_commit_file" "isis_config" {
-  # This dynamically looks for base_edge-a.txt or base_edge-b.txt
+# Protocols and NET Address via File
+# Configuration Commit from File on the active workspace
+resource "junos_null_commit_file" "isis_config" {
+  # This dynamically looks for File
   # depending on if the workspace is named 'edge-a' or 'edge-b'
   filename = "${path.module}/../templates/isis/base_${terraform.workspace}.txt"
+
+  # Ensure interfaces are created before attempting to enable IS-IS on them
+  depends_on = [
+    junos_interface_logical.p2p_link_v4_iso,
+    junos_interface_logical.loopback_v4_iso
+  ]
 }
