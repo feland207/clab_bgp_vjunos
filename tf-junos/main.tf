@@ -11,37 +11,34 @@ resource "junos_interface_physical" "p2p_link" {
 }
 
 # Logical Interface ge-0/0/1.0
-resource "junos_interface_logical" "p2p_link_v4_iso" {
+resource "junos_interface_logical" "p2p_link_v4" {
   name = "${junos_interface_physical.p2p_link.name}.0"
   family_inet {
     address {
-      port = local.node.iface_ip
+      cidr_ip = local.node.iface_ip     # Fixed: changed 'port' to 'cidr_ip'
     }
   }
-  family_iso {} # Enables ISO processing on the link
 }
 
 # Loopback Interface (lo0.0)
-resource "junos_interface_logical" "loopback_v4_iso" {
+resource "junos_interface_logical" "loopback_v4" {
   name = "lo0.0"
   family_inet {
     address {
-      port = local.node.lo0_ip
+      cidr_ip = local.node.lo0_ip       # Fixed: changed 'port' to 'cidr_ip'
     }
   }
-  family_iso {} # Enables ISO processing for the NET address
 }
 
-# Protocols and NET Address via File
+# Protocols and NET Address via File (Handles ISO and IS-IS)
 # Configuration Commit from File on the active workspace
-resource "junos_null_commit_file" "isis_config" {
-  # This dynamically looks for File
-  # depending on if the workspace is named 'edge-a' or 'edge-b'
+resource "junos_null_commit_file" "isis_config" { 
+  # Looks for file depending on if the workspace is named 'edge-a' or 'edge-b'
   filename = "${path.module}/../templates/isis/base_${terraform.workspace}.txt"
 
   # Ensure interfaces are created before attempting to enable IS-IS on them
   depends_on = [
-    junos_interface_logical.p2p_link_v4_iso,
-    junos_interface_logical.loopback_v4_iso
+    junos_interface_logical.p2p_link_v4,
+    junos_interface_logical.loopback_v4
   ]
 }
