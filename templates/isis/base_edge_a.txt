@@ -1,0 +1,12 @@
+# IS-IS Protocol Global Settings
+set protocols isis level-capability level-2
+
+# Interface specific IS-IS settings
+set protocols isis interface ge-0/0/1.0 level 2
+set protocols isis interface ge-0/0/1.0 point-to-point
+set protocols isis interface lo0.0
+
+# ISO NET Address (System ID) - This must be unique per router
+set interfaces lo0 unit 0 family iso address 49.0001.0000.0000.00ea.00
+
+# <NET_ADDRESS> is 49.0001...
