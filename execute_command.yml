@@ -1,0 +1,36 @@
+---
+- name: Interactive Junos Show Command
+  hosts: all
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_prompt:
+    - name: user
+      prompt: Enter username
+      private: false
+
+    - name: passwd
+      prompt: Enter password
+      private: true
+
+    - name: user_show_command
+      prompt: "Enter the Junos show command (e.g., show version)"
+      private: no
+      default: "show version"
+
+  vars:
+    wait_time: 60
+    log_dir: ./log/ansible
+
+  vars_files:
+    - vars_example.yml
+
+  tasks:
+    - name: Execute command on Junos devices
+      juniper.device.command:
+        commands: "{{ user_show_command }}"
+      register: command_output
+
+    - name: Print command results nicely
+      ansible.builtin.debug:
+        msg: "{{ command_output.stdout_lines }}"

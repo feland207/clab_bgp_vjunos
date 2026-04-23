@@ -1,0 +1,35 @@
+---
+- name: Collect backup config
+  hosts: all
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_prompt:
+    - name: user
+      prompt: Enter username
+      private: false
+
+    - name: passwd
+      prompt: Enter password
+      private: true
+
+  vars:
+    wait_time: 60
+    log_dir: ./log/ansible
+
+  vars_files:
+    - vars_example.yml
+
+  tasks:
+    - name: Create local configs directory
+      delegate_to: localhost
+      run_once: true
+      file:
+        path: backups
+        state: directory
+
+    - name: Execute show configuration
+      juniper.device.command:
+        commands:
+          - show configuration
+        dest: "{{ playbook_dir }}/backups/{{ inventory_hostname }}.conf"
