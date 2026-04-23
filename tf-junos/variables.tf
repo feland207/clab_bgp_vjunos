@@ -19,6 +19,8 @@ variable "ssh_key_path" {
   default = ""
 }
 */
+
+# This is not efficient for a production environment and should be handled it in a different in the future.
 variable "isis_nodes" {
   type = map(object({
     mgmt_ip    = string
@@ -44,3 +46,28 @@ variable "isis_nodes" {
     }
   }
 }
+
+/*
+Workflow example:
+
+terraform init
+
+# Create and select the workspace
+terraform workspace new edge-a
+
+# Plan for EDGE-A
+terraform plan -var="mgmt_ip=172.50.50.30"
+
+# Apply for EDGE-A
+terraform apply -var="mgmt_ip=172.50.50.30"
+
+# Create and select the workspace
+terraform workspace new edge-b
+
+# Plan for EDGE-B
+terraform plan -var="mgmt_ip=172.50.50.40"
+
+# Apply for EDGE-B
+terraform apply -var="mgmt_ip=172.50.50.40"
+
+*/
