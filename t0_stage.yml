@@ -18,7 +18,7 @@
     log_dir: ./log/ansible
 
   vars_files:
-    - vars_example.yml
+    - secrets.yml
 
   tasks:
     - name: Create local configs directory
