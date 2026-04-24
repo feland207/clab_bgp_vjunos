@@ -3,6 +3,17 @@
   hosts: all
   connection: juniper.device.pyez
   gather_facts: no
+  # Increased timeouts just for this playbook
+  module_defaults:
+    juniper.device.config:
+      timeout: 60
+    juniper.device.command:
+      timeout: 60
+
+  vars_prompt:
+    - name: user_comment
+      prompt: Type a rollback comment
+      private: false
 
   vars_files:
     - secrets.yml
@@ -27,14 +38,29 @@
         prompt: "Are you sure you want to rollback to index {{ user_choice.user_input }}? Type 'yes' to proceed"
       register: final_confirm
 
+    - name: Record Start Time
+      set_fact:
+        rollback_start: "{{ lookup('pipe', 'date +%s') }}"
+
     - name: 5. Execute Rollback
       juniper.device.config:
         # Using Jinja2 int filter and ensuring no trailing spaces
         rollback: "{{ user_choice.user_input | trim | int }}"
-        comment: "Rollback performed via Ansible to index {{ user_choice.user_input | trim }}"
+        comment: "{{ user_comment | trim }}"
         commit: true
       register: rollback_output
       when: final_confirm.user_input == 'yes'
+
+    - name: Record End Time
+      set_fact:
+        rollback_end: "{{ lookup('pipe', 'date +%s') }}"
+
+    - name: Calculate and Display Duration
+      vars:
+        duration: "{{ rollback_end | int - rollback_start | int }}"
+      debug:
+        msg: "The rollback and commit process took {{ duration }} seconds."
+      when: rollback_output.changed | default(false)
 
     - name: Debug Rollback Output
       ansible.builtin.debug:
