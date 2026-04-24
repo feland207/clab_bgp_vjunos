@@ -62,3 +62,5 @@
     #   loop_control:
     #     # Hides the 'item' content in the task header to keep it 'clean'
     #     label: "Line"
+
+    # ansible-playbook run_command.yml -l ISP-A | tee debug_run.log
