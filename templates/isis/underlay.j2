@@ -1,0 +1,8 @@
+set interfaces lo0 unit 0 family iso address {{ net_address }}
+set protocols isis level 2 disable
+set protocols isis interface lo0.0
+{% for intf in isis_interfaces %}
+set interfaces {{ intf }} family iso
+set protocols isis interface {{ intf }} point-to-point
+set protocols isis interface {{ intf }} level 1
+{% endfor %}

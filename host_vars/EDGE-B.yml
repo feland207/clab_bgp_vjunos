@@ -1,0 +1,4 @@
+net_address: "49.0001.0000.0000.00e2.00"
+isis_interfaces:
+  - "ge-0/0/1.0"  # Interchassis link to EDGE-A
+  - "ge-0/0/2.0"  # Uplink to CORE-ROUTER

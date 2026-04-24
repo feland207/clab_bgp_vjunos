@@ -1,0 +1,30 @@
+---
+- name: "STAGE 1: Implement IS-IS Level 1 Underlay"
+  hosts: core, edge
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: Configure IS-IS Level 1
+      juniper.device.config:
+        load: "merge"
+        format: "set"
+        # We define the loopback address and enable family iso + isis protocol
+        # The 'lookup' renders the file locally and returns a clean string
+        lines: "{{ lookup('template', 'templates/isis/underlay.j2') }}"
+        # Accesses all host_vars automatically
+        commit: yes
+        comment: "Configuring IS-IS Level 1 Underlay via Ansible"
+      register: config_result
+
+    - name: Display Configuration Changes
+      ansible.builtin.debug:
+        var: config_result.diff_lines
+      when: config_result.changed
+
+# Sanity check
+# ansible CORE-ROUTER -m debug -a "var=isis_interfaces"
+# ansible CORE-ROUTER -m debug -a "var=hostvars[inventory_hostname]"
