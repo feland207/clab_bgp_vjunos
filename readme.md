@@ -30,15 +30,3 @@ Design:
 
 NOTE: This repo can be used as a playground for Terraform. 
 
-
-
-
-Now please generate the play to implement MAC-VRF over my P2P underlay this should include the edge(s) and the core router. I will tackle it by steps: 
-
-1) IS-IS Level 1 between the 3 routers. Example NET_ADDRESS for Edge-A and Edge-B:
-
-49.0001.0000.0000.00ea.00
-49.0001.0000.0000.00eb.00
-
-
-
