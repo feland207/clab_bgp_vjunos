@@ -1,7 +1,7 @@
 ---
 - name: Interactive Junos Show Command
   hosts: all
-  connection: juniper.device.pyez
+  connection: juniper.device.pyez       # Use ansible.netcommon.netconf module for: junipernetworks.junos.junos
   gather_facts: no
 
   vars_prompt:
@@ -23,14 +23,27 @@
     log_dir: ./log/ansible
 
   vars_files:
-    - vars_example.yml
+    - secrets.yml
 
   tasks:
-    - name: Execute command on Junos devices
+    # - name: Reset of Persistent Connection
+    #   ansible.builtin.meta: reset_connection
+
+    - name: Run command on Junos devices
       juniper.device.command:
         commands: "{{ user_show_command }}"
-      register: command_output
+        formats: "text"
+      register: cli_response
 
-    - name: Print command results nicely
+    - name: Print command results (Beware it truncates stdout_lines!)
       ansible.builtin.debug:
-        msg: "{{ command_output.stdout_lines }}"
+        msg: "{{ cli_response.stdout_lines }}"
+
+    # The noisy approach
+    # - name: Print command output
+    #   ansible.builtin.debug:
+    #     msg: "{{ item }}"
+    #   loop: "{{ cli_response.stdout_lines }}"
+    #   loop_control:
+    #     # Hides the 'item' content in the task header to keep it 'clean'
+    #     label: "Line"
