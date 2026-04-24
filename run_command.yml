@@ -26,8 +26,12 @@
     - secrets.yml
 
   tasks:
-    # - name: Reset of Persistent Connection
-    #   ansible.builtin.meta: reset_connection
+    - name: Create logs debug directory
+      delegate_to: localhost
+      run_once: true
+      file:
+        path: logs
+        state: directory
 
     - name: Run command on Junos devices
       juniper.device.command:
@@ -38,6 +42,17 @@
     - name: Print command results (Beware it truncates stdout_lines!)
       ansible.builtin.debug:
         msg: "{{ cli_response.stdout_lines }}"
+
+    - name: Save Full Output to Logs
+      ansible.builtin.copy:
+        content: "{{ cli_response.stdout }}"
+        dest: "./logs/{{ inventory_hostname }}_{{ user_show_command | replace(' ', '_') }}.log"
+      delegate_to: localhost
+
+    - name: Logs saved
+      ansible.builtin.debug:
+        msg: "Full output saved to ./logs/{{ inventory_hostname }}_{{ user_show_command | replace(' ', '_') }}.log"
+
 
     # The noisy approach
     # - name: Print command output
