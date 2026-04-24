@@ -5,14 +5,6 @@
   gather_facts: no
 
   vars_prompt:
-    - name: user
-      prompt: Enter username
-      private: false
-
-    - name: passwd
-      prompt: Enter password
-      private: true
-
     - name: user_show_command
       prompt: "Enter the Junos show command (e.g., show version)"
       private: no

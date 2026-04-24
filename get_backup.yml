@@ -4,21 +4,12 @@
   connection: juniper.device.pyez
   gather_facts: no
 
-  vars_prompt:
-    - name: user
-      prompt: Enter username
-      private: false
-
-    - name: passwd
-      prompt: Enter password
-      private: true
-
   vars:
     wait_time: 60
     log_dir: ./log/ansible
 
   vars_files:
-    - vars_example.yml
+    - secrets.yml
 
   tasks:
     - name: Create local configs directory
