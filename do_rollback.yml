@@ -1,0 +1,51 @@
+---
+- name: Interactive Junos Rollback
+  hosts: all
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: 1. Retrieve Commit History
+      juniper.device.command:
+        commands: "show system commit"
+      register: commit_history
+
+    - name: 2. Display Commit History
+      debug:
+        msg: "{{ commit_history.stdout_lines }}"
+
+    - name: 3. Prompt for Commit ID
+      ansible.builtin.pause:
+        prompt: "Enter the Rollback Index (e.g., 1 for the previous config)"
+      register: user_choice
+
+    - name: 4. Final Confirmation
+      ansible.builtin.pause:
+        prompt: "Are you sure you want to rollback to index {{ user_choice.user_input }}? Type 'yes' to proceed"
+      register: final_confirm
+
+    - name: 5. Execute Rollback
+      juniper.device.config:
+        # Using Jinja2 int filter and ensuring no trailing spaces
+        rollback: "{{ user_choice.user_input | trim | int }}"
+        comment: "Rollback performed via Ansible to index {{ user_choice.user_input | trim }}"
+        commit: true
+      register: rollback_output
+      when: final_confirm.user_input == 'yes'
+
+    - name: Debug Rollback Output
+      ansible.builtin.debug:
+        var: rollback_output
+
+    - name: 6. Status Update
+      debug:
+        msg: "Rollback to index {{ user_choice.user_input }} completed."
+      when: final_confirm.user_input == 'yes'
+
+    - name: 7. Abort Message
+      debug:
+        msg: "Rollback cancelled by user."
+      when: final_confirm.user_input != 'yes'

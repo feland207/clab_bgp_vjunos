@@ -20,3 +20,6 @@ Physical Topology
            [ LAN Subnet A ]
             10.10.10.0/24
 
+
+
+NOTE: This repo can be used as a playground for Terraform. 
