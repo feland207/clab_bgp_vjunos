@@ -1,6 +1,11 @@
-set interfaces lo0 unit 0 family iso address {{ net_address }}
+# IS-IS Protocol Global Settings
 set protocols isis level 2 disable
+
+# Loopback specific IS-IS settings
+set interfaces lo0 unit 0 family iso address {{ net_address }}
 set protocols isis interface lo0.0
+
+# P2P IS-IS interface settings
 {% for intf in isis_interfaces %}
 set interfaces {{ intf }} family iso
 set protocols isis interface {{ intf }} point-to-point

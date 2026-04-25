@@ -75,3 +75,6 @@
       debug:
         msg: "Rollback cancelled by user."
       when: final_confirm.user_input != 'yes'
+
+# TODO: 
+# - Bug when executing rollbacks on multiple nodes, final_confirm is not seen by juniper.device.config; Possible workaround using ansible facts.

@@ -21,12 +21,15 @@ Physical Topology
             10.10.10.0/24
 
 Design:
+- Using loopback interfaces for all vJunos
 - Underlay: IS-IS with jumbo frames
 - Overlay: VXLAN / EVPN (the service layer)
 - VRFs (Inside/Outside) for traffic isolation
 - Core-Router is a VTEP for the Subnet A
+- Add fake subnets and traffic generator for BGP route advertisements
 
+To-Do List:
+- Implement a simple MAC-VRF over our P2P underlay to see the separation of transport (IS-IS) and service (EVPN/VXLAN).
 
 
 NOTE: This repo can be used as a playground for Terraform. 
-
