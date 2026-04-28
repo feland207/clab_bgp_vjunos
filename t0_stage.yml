@@ -17,9 +17,6 @@
     wait_time: 60
     log_dir: ./log/ansible
 
-  vars_files:
-    - secrets.yml
-
   tasks:
     - name: Create local configs directory
       delegate_to: localhost
@@ -43,12 +40,13 @@
       ansible.builtin.debug:
         var: response.diff_lines
 
+    # Only needed if we use connection: local
     # - name: Force refresh of the Netconf session (Not needed when using connection: juniper.device.pyez)
-    #   # Change the session password so the NEXT task uses the new one; Only needed if we use connection: local
+    #   # Change the session password so the NEXT task uses the new one
     #   set_fact:
     #     ansible_password: admin123
 
-    - name: Execute show configuration
+    - name: Save configuration
       juniper.device.command:
         commands:
           - show configuration
@@ -59,3 +57,4 @@
 # Update passwords workaround for the NETCONF session (which is non-interactive)
 # Generate a SHA-512 hash (standard for vJunos-switch)
 # openssl passwd -6 admin123
+  
