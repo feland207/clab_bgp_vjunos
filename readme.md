@@ -32,4 +32,4 @@ To-Do List:
 - Implement a simple MAC-VRF over our P2P underlay to see the separation of transport (IS-IS) and service (EVPN/VXLAN).
 
 
-NOTE: This repo can be used as a playground for Terraform. 
+NOTE: This repo can be used as a playground for Terraform / Ansible. Find the clab topology in gdrive.
