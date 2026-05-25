@@ -26,9 +26,9 @@ topology:
   links:
     # Setting Linux veth MTU to 9100
     #--- EDGEs to ISP ---
-    - endpoints: ["R2:eth1", "host:r4-link02"]
+    - endpoints: ["R2:eth1", "host:r4-link01"]
       mtu: 9100
-    - endpoints: ["R3:eth1", "host:r4-link03"]
+    - endpoints: ["R3:eth1", "host:r4-link02"]
       mtu: 9100
 
     #--- Interchassis EDGEs ---
@@ -36,23 +36,24 @@ topology:
       mtu: 9100
 
     #--- EDGEs to CORE ---
-    - endpoints: ["R2:eth3", "host:r1-link02"]
+    - endpoints: ["R2:eth3", "host:r1-link03"]
       mtu: 9100
-    - endpoints: ["R3:eth3", "host:r1-link03"]
+    - endpoints: ["R3:eth3", "host:r1-link04"]
       mtu: 9100
 
 #--- EDGEs to ISP ---
-# | VNI 110 | R2 ge-0/0/0: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
-# | VNI 120 | R3 ge-0/0/0: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
+# | VNI 240 | R2 ge-0/0/0: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
+# | VNI 340 | R3 ge-0/0/0: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
 
 # Bridge our Debian veth interface to Popos laptop
-# clab tools vxlan create --remote 192.168.1.63 --link r4-link02 --id 110
-# clab tools vxlan create --remote 192.168.1.63 --link r4-link03 --id 120
+# clab tools vxlan create --remote 192.168.1.63 --link r4-link01 --id 240
+# clab tools vxlan create --remote 192.168.1.63 --link r4-link02 --id 340
 
 #--- EDGEs to CORE ---
-# | VNI 140 | R2 ge-0/0/2: 100.100.12.2/30 | R1 ge-0/0/0: 100.100.12.1/30 |
+# | VNI 120 | R2 ge-0/0/2: 100.100.12.2/30 | R1 ge-0/0/0: 100.100.12.1/30 |
 # | VNI 130 | R3 ge-0/0/2: 100.100.13.2/30 | R1 ge-0/0/1: 100.100.13.1/30 |
 
 # Bridge our Debian veth interface to Popos laptop
-# clab tools vxlan create --remote 192.168.1.63 --link r1-link02 --id 130
-# clab tools vxlan create --remote 192.168.1.63 --link r1-link03 --id 140
+# clab tools vxlan create --remote 192.168.1.63 --link r1-link02 --id 120
+# clab tools vxlan create --remote 192.168.1.63 --link r1-link03 --id 130
+
