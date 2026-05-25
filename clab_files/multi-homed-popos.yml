@@ -1,0 +1,82 @@
+name: bgp-multi-homed
+
+mgmt:
+  network: custom-mgmt
+  ipv4-subnet: 172.60.60.0/24
+
+topology:
+  kinds:
+    juniper_vjunosswitch:
+      image: vrnetlab/juniper_vjunos-switch:25.4R1.12       # The image we built
+      cpu: 2                                                # Prevents GUI freezing
+      memory: 3584Mi                                        # Protects our available RAM
+
+  nodes:
+    #--- CORE ROUTER ---
+    R1:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.60.60.10
+      startup-delay: 60
+
+    #--- AS200 ROUTERS ---
+    R4:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.60.60.40
+      startup-delay: 120
+
+    #--- AS300 ROUTERS ---
+    R5:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.60.60.50
+      startup-delay: 180
+
+    R6:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.60.60.60
+      startup-delay: 220
+
+#     R7:
+#       kind: juniper_vjunosswitch
+#       mgmt-ipv4: 172.60.60.70
+#       startup-delay: 280
+
+  links:
+    # Setting Linux veth MTU to 9100
+    #--- CORE to EDGEs ---
+    - endpoints: ["R1:eth1", "host:r2-link01"]
+      mtu: 9100
+    - endpoints: ["R1:eth2", "host:r3-link02"]
+      mtu: 9100
+
+    #--- ISP to EDGEs ---
+    - endpoints: ["R4:eth1", "host:r2-link03"]
+      mtu: 9100
+    - endpoints: ["R4:eth2", "host:r3-link04"]
+      mtu: 9100
+
+    #--- ISP to AS300 ---
+    - endpoints: ["R4:eth3", "R5:eth1"]
+      mtu: 9100
+
+    #--- Inter-routers AS300 ---
+    - endpoints: ["R5:eth2", "R6:eth1"]
+      mtu: 9100
+
+
+#--- CORE to EDGEs ---
+# | VNI 120 | R1 ge-0/0/0: 100.100.12.1/30 | R2 ge-0/0/0: 100.100.12.2/30 |
+# | VNI 130 | R1 ge-0/0/1: 100.100.13.1/30 | R3 ge-0/0/0: 100.100.13.2/30 |
+
+# Bridge our Popos veth interface to Debian laptop
+# clab tools vxlan create --remote 192.168.1.160 --link r2-link01 --id 120
+# clab tools vxlan create --remote 192.168.1.160 --link r3-link02 --id 130
+
+
+#--- ISP to EDGEs ---
+# | VNI 240 | R2 ge-0/0/1: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
+# | VNI 340 | R3 ge-0/0/1: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
+
+# Bridge our Popos veth interface to Debian laptop
+# clab tools vxlan create --remote 192.168.1.160 --link r2-link03 --id 240
+# clab tools vxlan create --remote 192.168.1.160 --link r3-link04 --id 340
+
