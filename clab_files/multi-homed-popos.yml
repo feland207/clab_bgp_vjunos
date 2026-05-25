@@ -43,15 +43,15 @@ topology:
   links:
     # Setting Linux veth MTU to 9100
     #--- CORE to EDGEs ---
-    - endpoints: ["R1:eth1", "host:r2-link01"]
+    - endpoints: ["R1:eth1", "host:r1tor2_id120"]
       mtu: 9100
-    - endpoints: ["R1:eth2", "host:r3-link02"]
+    - endpoints: ["R1:eth2", "host:r1tor3_id130"]
       mtu: 9100
 
     #--- ISP to EDGEs ---
-    - endpoints: ["R4:eth1", "host:r2-link03"]
+    - endpoints: ["R4:eth1", "host:r4tor2_id240"]
       mtu: 9100
-    - endpoints: ["R4:eth2", "host:r3-link04"]
+    - endpoints: ["R4:eth2", "host:r4tor3_id340"]
       mtu: 9100
 
     #--- ISP to AS300 ---
@@ -68,8 +68,8 @@ topology:
 # | VNI 130 | R1 ge-0/0/1: 100.100.13.1/30 | R3 ge-0/0/0: 100.100.13.2/30 |
 
 # Bridge our Popos veth interface to Debian laptop
-# clab tools vxlan create --remote 192.168.1.160 --link r2-link01 --id 120
-# clab tools vxlan create --remote 192.168.1.160 --link r3-link02 --id 130
+# clab tools vxlan create --remote 192.168.1.160 --link r1tor2_id120 --id 120
+# clab tools vxlan create --remote 192.168.1.160 --link r1tor3_id130 --id 130
 
 
 #--- ISP to EDGEs ---
@@ -77,6 +77,9 @@ topology:
 # | VNI 340 | R3 ge-0/0/1: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
 
 # Bridge our Popos veth interface to Debian laptop
-# clab tools vxlan create --remote 192.168.1.160 --link r2-link03 --id 240
-# clab tools vxlan create --remote 192.168.1.160 --link r3-link04 --id 340
+# clab tools vxlan create --remote 192.168.1.160 --link r4tor2_id240 --id 240
+# clab tools vxlan create --remote 192.168.1.160 --link r4tor3_id340 --id 340
+
+# Static route to reach Debian mgmt
+# sudo ip route add 172.50.50.0/24 via 192.168.1.160
 

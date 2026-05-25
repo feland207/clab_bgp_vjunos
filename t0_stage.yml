@@ -5,10 +5,12 @@
   gather_facts: no
 
   vars_prompt:
+    # T0 login username
     - name: user
       prompt: Enter username
       private: false
 
+    # T0 login password
     - name: passwd
       prompt: Enter password
       private: true
