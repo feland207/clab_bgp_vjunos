@@ -21,7 +21,7 @@ Physical Topology
             10.10.10.0/24
 
 Design:
-- Using loopback interfaces for all vJunos
+- Using loopback interfaces (lo0) in all vJunos
 - Underlay: IS-IS with jumbo frames
 - Overlay: VXLAN / EVPN (the service layer)
 - VRFs (Inside/Outside) for traffic isolation

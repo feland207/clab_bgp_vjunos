@@ -54,6 +54,6 @@ topology:
 # | VNI 130 | R3 ge-0/0/2: 100.100.13.2/30 | R1 ge-0/0/1: 100.100.13.1/30 |
 
 # Bridge our Debian veth interface to Popos laptop
-# clab tools vxlan create --remote 192.168.1.63 --link r1-link02 --id 120
-# clab tools vxlan create --remote 192.168.1.63 --link r1-link03 --id 130
+# clab tools vxlan create --remote 192.168.1.63 --link r1-link03 --id 120
+# clab tools vxlan create --remote 192.168.1.63 --link r1-link04 --id 130
 
