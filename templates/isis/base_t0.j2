@@ -2,12 +2,12 @@
 set protocols isis level 2 disable
 
 # Loopback specific IS-IS settings
-set interfaces lo0 unit 0 family iso address {{ net_address }}
-set protocols isis interface lo0.0
+set interfaces lo0 unit 0 family iso address {{ isis_area_id }}.{{ isis_system_id }}.00
+set protocols isis interface lo0.0 passive
 
 # P2P IS-IS interface settings
-{% for intf in isis_interfaces %}
-set interfaces {{ intf }} family iso
-set protocols isis interface {{ intf }} point-to-point
-set protocols isis interface {{ intf }} level 1
+{% for iface in isis_interfaces %}
+set interfaces {{ iface }} unit 0 family iso
+set protocols isis interface {{ iface }} level 1
+set protocols isis interface {{ iface }}.0 point-to-point
 {% endfor %}

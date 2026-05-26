@@ -54,5 +54,5 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 |   ├── R5.yml
 |   └── R6.yml
 └── underlay
-    ├── p2p_ring.yml               # Vars for loopback0 and p2p interfaces
-    └── isis_ring.yml              # Vars IS-IS interfaces, level-capability and iso address
+    ├── p2p_ring.j2                # Vars for loopback0 and p2p interfaces
+    └── isis_ring.j2               # Vars IS-IS interfaces, level-capability and iso address
