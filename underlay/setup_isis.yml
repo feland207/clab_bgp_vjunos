@@ -5,26 +5,47 @@
   gather_facts: no
 
   vars_files:
-    - secrets.yml
+    - ../secrets.yml
 
   tasks:
+    - name: Load per-node static variables
+      ansible.builtin.include_vars:
+        file: "../node_vars/{{ inventory_hostname }}.yml"
+
+    - name: Configure P2P IPv4 and Loopbacks
+      juniper.device.config:
+        load: "set"
+        format: "set"
+        # The 'lookup' renders the file locally and returns a clean string
+        lines: "{{ lookup('template', '../templates/isis/p2p_t0.j2') }}"
+        # We don't commit yet; we wait for the next task
+        commit: no
+      register: p2p_result
+
+    - name: PREVIEW - Show rendered IS-IS configuration
+      ansible.builtin.debug:
+        # Renders the template locally and splits it into a readable list
+        msg: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
+
     - name: Configure IS-IS Level 1
       juniper.device.config:
         load: "merge"
         format: "set"
         # We define the loopback address and enable family iso + isis protocol
         # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', 'templates/isis/base_t0.j2') }}"
+        lines: "{{ lookup('template', '../templates/isis/base_t0.j2') }}"
         # Accesses all host_vars automatically
+        # Commit both the IPv4 and ISO configs at the same time
         commit: yes
-        comment: "Configuring IS-IS Level 1 Underlay via Ansible"
-      register: config_result
+        comment: "Ansible: Configured P2P IPs and IS-IS"
+      register: isis_result
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        var: config_result.diff_lines
-      when: config_result.changed
+        var: isis_result.diff_lines
+      # Only show the debug if something actually changed
+      when: isis_result.changed or p2p_result.changed
 
 # Sanity check
-# ansible CORE-ROUTER -m debug -a "var=isis_interfaces"
-# ansible CORE-ROUTER -m debug -a "var=hostvars[inventory_hostname]"
+# ansible R2 -i inventory.ini -e "@node_vars/R2.yml" -m debug -a "var=interfaces"
+# ansible emea -m debug -a "var=hostvars[inventory_hostname]"
