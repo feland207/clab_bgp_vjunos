@@ -42,10 +42,11 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 ├── secrets.yml
 ├── templates
 │   └── isis
-│       └── base_t0.j2
+|       ├── p2p_ring.yml               # Configure loopback0 and p2p interfaces
+│       └── base_t0.j2                 # Configure IS-IS interfaces, level-capability and iso address
 ├── group_vars/
 │   └── all.yml                    # Global variables (e.g., IS-IS ISO NET Address, IS-IS area)
-├── host_vars/                     # Static YAML files containing per-node data
+├── node_vars/                     # Static YAML files containing per-node data
 |   ├── R1.yml
 |   ├── R2.yml
 |   ├── R3.yml
@@ -53,5 +54,5 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 |   ├── R5.yml
 |   └── R6.yml
 └── underlay
-    ├── p2p_ring.yml               # Configure loopback0 and p2p interfaces
-    └── isis_ring.yml              # Configure IS-IS interfaces, level-capability and iso address
+    ├── p2p_ring.yml               # Vars for loopback0 and p2p interfaces
+    └── isis_ring.yml              # Vars IS-IS interfaces, level-capability and iso address

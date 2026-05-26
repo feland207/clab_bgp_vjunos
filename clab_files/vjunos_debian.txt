@@ -7,6 +7,21 @@ set interfaces ge-0/0/1 description "Link to R3"
 set interfaces ge-0/0/2 unit 0 family inet address 100.100.12.2/30
 set interfaces ge-0/0/2 description "Link to R1"
 
+# Loopback IPv4 and ISO Network Entity Title (NET)
+set interfaces lo0 unit 0 family iso address 49.0001.0000.0000.2222.00
+
+# Enable ISO family on point-to-point interfaces
+set interfaces ge-0/0/0 unit 0 family iso
+set interfaces ge-0/0/1 unit 0 family iso
+set interfaces ge-0/0/2 unit 0 family iso
+
+# IS-IS Protocol Configuration
+set protocols isis level 2 disable
+set protocols isis interface lo0.0 passive
+set protocols isis interface ge-0/0/0.0 point-to-point
+set protocols isis interface ge-0/0/1.0 point-to-point
+set protocols isis interface ge-0/0/2.0 point-to-point
+
 #--- R3 ---
 set interfaces lo0 unit 0 family inet address 3.3.3.3/32
 set interfaces ge-0/0/0 unit 0 family inet address 100.100.34.1/30
