@@ -1,0 +1,20 @@
+---
+# System ID for IS-IS (Derived from node number for simplicity, e.g., 0000.0000.0002)
+isis_system_id: "49.0001.0000.0000.0001.00"
+
+# Loopback interfaces
+loopback_lo0: "1.1.1.1/32"
+
+# P2P Interfaces
+interfaces:
+  # Connection to R2
+  - [cite_start]name: "ge-0/0/0"
+    description: "Link to R2"
+    [cite_start]ipv4_address: "100.100.12.1/30"
+    isis_metric: 10
+
+  # Connection to R3
+  - [cite_start]name: "ge-0/0/1"
+    description: "Link to R3"
+    [cite_start]ipv4_address: "100.100.13.1/30"
+    isis_metric: 10
