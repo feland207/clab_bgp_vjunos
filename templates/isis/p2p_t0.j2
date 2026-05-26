@@ -1,0 +1,5 @@
+set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }}
+{% for iface in interfaces %}
+set interfaces {{ iface.name }} description "{{ iface.description }}"
+set interfaces {{ iface.name }} unit 0 family inet address {{ iface.ipv4_address }}
+{% endfor %}
