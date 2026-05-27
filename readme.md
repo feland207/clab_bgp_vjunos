@@ -59,12 +59,22 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 
 #### How to capture pcaps
 
-##### Capturing the VXLAN Tunnels
-sudo tcpdump -i vx-r2tor4_id240 -w payload_isis.pcap
+##### Capturing a VXLAN Tunnel payload (best to see just routing protocols):
+sudo tcpdump -i vx-r2tor4_id240 -w payload_vxid240.pcap
 
-##### Capturing the encapsulated traffic on the physical link Wi-Fi interfaces (wlo1 on Debian or wlp4s0 on Pop OS)
-sudo tcpdump -i wlo1 port 4789 -w vxlan_underlay.pcap
-sudo tcpdump -i wlp4s0 port 4789 -w vxlan_underlay.pcap
+##### Capturing the entire vxlan header for the physical link Wi-Fi interfaces (wlo1 on Debian or wlp4s0 on Pop OS)
+Run to find the vxlan dstport:
+ip -d link show type vxlan
+Run to capture all WiFi VxLAN traffic:
+sudo tcpdump -i wlo1 udp port 14789 -w vxlans_underlay.pcap
+sudo tcpdump -i wlp4s0 udp port 14789 -w vxlans_underlay.pcap
 
-NOTE: 
-- If Wireshark just shows it as generic UDP traffic, right-click any of the packets -> Decode As -> select VXLAN from the Current dropdown.
+NOTE:
+- This will capture all local laptop vxlan interfaces traffic, (assuming the vx- interfaces use the same dstport). 
+Could be difficult to distinguish source/destination.
+
+##### Capturing inter-nodes payload (best to see clab inter-nodes routing protocols)
+Run to find the network namespace (usally matches the container name):
+ip netns list
+Run to capture inter-nodes traffic:
+sudo ip netns exec clab-bgp-multi-homed-R2 tcpdump -nni eth2 -w r2_r3_eth2.pcap
