@@ -59,4 +59,3 @@
 # Update passwords workaround for the NETCONF session (which is non-interactive)
 # Generate a SHA-512 hash (standard for vJunos-switch)
 # openssl passwd -6 admin123
-  

@@ -2,4 +2,10 @@ set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }}
 {% for iface in interfaces %}
 set interfaces {{ iface.name }} description "{{ iface.description }}"
 set interfaces {{ iface.name }} unit 0 family inet address {{ iface.ipv4_address }}
+# set interfaces {{ iface.name }} unit 0 family inet unnumbered-address lo0.0
 {% endfor %}
+
+{#
+Optional to use IP unnumbered.
+Mapping all point-to-point interfaces to the exact same loopback unit (e.g., lo0.0)
+#}
