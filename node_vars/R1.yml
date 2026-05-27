@@ -1,0 +1,11 @@
+---
+loopback_ipv4: "1.1.1.1/32"
+isis_system_id: "0000.0000.1111"
+
+interfaces:
+  - name: "ge-0/0/0"
+    ipv4_address: "100.100.12.1/30"
+    description: "Link to R2"
+  - name: "ge-0/0/1"
+    ipv4_address: "100.100.13.1/30"
+    description: "Link to R3"

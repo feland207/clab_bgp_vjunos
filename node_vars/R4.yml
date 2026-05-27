@@ -9,3 +9,6 @@ interfaces:
   - name: "ge-0/0/1"
     ipv4_address: "100.100.34.2/30"
     description: "Link to R3"
+  - name: "ge-0/0/2"
+    ipv4_address: "100.100.45.1/30"
+    description: "Link to R5"

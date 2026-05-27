@@ -12,6 +12,15 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
+    - name: PREVIEW - Show rendered P2P IPv4 and IS-IS configuration
+      ansible.builtin.debug:
+        # Renders the template locally and splits it into a readable list
+        msg: 
+          - "#--- P2P IPv4 ---#"
+          - "{{ lookup('template', '../templates/isis/p2p_t0.j2').splitlines() }}"
+          - "#--- IS-IS Level 1 ---#"
+          - "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
+
     - name: Configure P2P IPv4 and Loopbacks
       juniper.device.config:
         load: "set"       # Used for set-commands
@@ -19,12 +28,8 @@
         # The 'lookup' renders the file locally and returns a clean string
         lines: "{{ lookup('template', '../templates/isis/p2p_t0.j2').splitlines() }}"
         comment: "Ansible: Configured P2P IPv4 and Loopbacks"
+        # commit: no
       register: p2p_result
-
-    - name: PREVIEW - Show rendered P2P IPv4 and IS-IS configuration
-      ansible.builtin.debug:
-        # Renders the template locally and splits it into a readable list
-        msg: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
 
     - name: Configure IS-IS Level 1
       juniper.device.config:
@@ -34,11 +39,15 @@
         # The 'lookup' renders the file locally and returns a clean string
         lines: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
         comment: "Ansible: Configured IS-IS Level 1"
+        # commit: no
       register: isis_result
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        var: isis_result
+        var: "{{ item }}"
+      loop:
+        - isis_result.diff_lines
+        - p2p_result.diff_lines
       # Only show the debug if something actually changed
       when: isis_result.changed or p2p_result.changed
 

@@ -56,3 +56,15 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 └── underlay
     ├── setup_p2p.yml                # Play for loopback0 and p2p interfaces
     └── setup_isis.yml               # Play for IS-IS interfaces, level-capability and iso address
+
+#### How to capture pcaps
+
+##### Capturing the VXLAN Tunnels
+sudo tcpdump -i vx-r2tor4_id240 -w payload_isis.pcap
+
+##### Capturing the encapsulated traffic on the physical link Wi-Fi interfaces (wlo1 on Debian or wlp4s0 on Pop OS)
+sudo tcpdump -i wlo1 port 4789 -w vxlan_underlay.pcap
+sudo tcpdump -i wlp4s0 port 4789 -w vxlan_underlay.pcap
+
+NOTE: 
+- If Wireshark just shows it as generic UDP traffic, right-click any of the packets -> Decode As -> select VXLAN from the Current dropdown.
