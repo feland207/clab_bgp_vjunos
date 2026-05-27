@@ -29,11 +29,11 @@
 
     - name: Configure IS-IS Level 1
       juniper.device.config:
-        load: "merge"
+        load: "set"       # Use set for set-commands
         format: "set"
         # We define the loopback address and enable family iso + isis protocol
         # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/isis/base_t0.j2') }}"
+        lines: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
         # Accesses all host_vars automatically
         # Commit both the IPv4 and ISO configs at the same time
         commit: yes
@@ -42,7 +42,7 @@
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        var: isis_result.diff_lines
+        var: isis_result
       # Only show the debug if something actually changed
       when: isis_result.changed or p2p_result.changed
 
