@@ -14,30 +14,26 @@
 
     - name: Configure P2P IPv4 and Loopbacks
       juniper.device.config:
-        load: "set"
-        format: "set"
+        load: "set"       # Used for set-commands
+        format: "set"     # Needed when using Jinja2 templates with set commands
         # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/isis/p2p_t0.j2') }}"
-        # We don't commit yet; we wait for the next task
-        commit: no
+        lines: "{{ lookup('template', '../templates/isis/p2p_t0.j2').splitlines() }}"
+        comment: "Ansible: Configured P2P IPv4 and Loopbacks"
       register: p2p_result
 
-    - name: PREVIEW - Show rendered IS-IS configuration
+    - name: PREVIEW - Show rendered P2P IPv4 and IS-IS configuration
       ansible.builtin.debug:
         # Renders the template locally and splits it into a readable list
         msg: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
 
     - name: Configure IS-IS Level 1
       juniper.device.config:
-        load: "set"       # Use set for set-commands
+        load: "set"
         format: "set"
         # We define the loopback address and enable family iso + isis protocol
         # The 'lookup' renders the file locally and returns a clean string
         lines: "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
-        # Accesses all host_vars automatically
-        # Commit both the IPv4 and ISO configs at the same time
-        commit: yes
-        comment: "Ansible: Configured P2P IPs and IS-IS"
+        comment: "Ansible: Configured IS-IS Level 1"
       register: isis_result
 
     - name: Display Configuration Changes
@@ -49,3 +45,6 @@
 # Sanity check
 # ansible R2 -i inventory.ini -e "@node_vars/R2.yml" -m debug -a "var=interfaces"
 # ansible emea -m debug -a "var=hostvars[inventory_hostname]"
+
+# Source Link:
+# https://www.juniper.net/documentation/us/en/software/junos-ansible/ansible/topics/topic-map/junos-ansible-configuration-retrieving.html
