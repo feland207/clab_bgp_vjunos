@@ -1,0 +1,14 @@
+{# Global BGP Autonomous System #}
+set routing-options autonomous-system {{ bgp.local_as }}
+
+{# Iterate through all defined BGP peers #}
+{% for peer in bgp.peers %}
+{# Define the group type (internal/external) #}
+set protocols bgp group {{ peer.group }} type {{ peer.type }}
+
+{# Strip the /32 from the loopback variable for the local-address #}
+set protocols bgp group {{ peer.group }} local-address {{ loopback_ipv4.split('/')[0] }}
+
+{# Define the specific neighbor and description #}
+set protocols bgp group {{ peer.group }} neighbor {{ peer.ip }} description "{{ peer.description }}"
+{% endfor %}

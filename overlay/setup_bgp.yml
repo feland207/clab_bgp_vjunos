@@ -1,0 +1,37 @@
+---
+- name: "STAGE 2: Implement BGP Overlay"
+  hosts: all
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_files:
+    - ../secrets.yml
+
+  tasks:
+    - name: Load per-node static variables
+      ansible.builtin.include_vars:
+        file: "../node_vars/{{ inventory_hostname }}.yml"
+
+    - name: PREVIEW - Show rendered BGP configuration
+      ansible.builtin.debug:
+        msg: 
+          - "#--- BGP Overlay ---#"
+          - "{{ lookup('template', '../templates/bgp/base_t0.j2').splitlines() }}"
+
+    - name: Configure BGP Settings
+      juniper.device.config:
+        load: "set"
+        format: "set"
+        # Renders the template, splits to list, and drops empty lines to prevent silent failures
+        lines: "{{ lookup('template', '../templates/bgp/base_t0.j2').splitlines() }}"
+        comment: "Ansible: Configured iBGP Overlay"
+        # commit: no  (Defaults to yes)
+      register: bgp_result
+
+    - name: Display Configuration Changes
+      ansible.builtin.debug:
+        # We use {{ item }} to force double interpolation of the variable names
+        var: "{{ item }}"
+      loop:
+        - bgp_result.diff_lines
+      when: bgp_result.changed

@@ -6,3 +6,12 @@ interfaces:
   - name: "ge-0/0/0"
     ipv4_address: "100.100.56.2/30"
     description: "Link to R5"
+
+# BGP Overlay Configuration
+bgp:
+  local_as: 100
+  peers:
+    - ip: "1.1.1.1"
+      group: "IBGP-OVERLAY"
+      type: "internal"
+      description: "iBGP to R1"
