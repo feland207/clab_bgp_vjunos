@@ -33,7 +33,7 @@
 
     - name: Configure IS-IS Level 1
       juniper.device.config:
-        load: "set"
+        load: "set"       # set performs a merge operation behind the scenes.
         format: "set"
         # We define the loopback address and enable family iso + isis protocol
         # The 'lookup' renders the file locally and returns a clean string

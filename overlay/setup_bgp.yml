@@ -24,7 +24,7 @@
         format: "set"
         # Renders the template, splits to list, and drops empty lines to prevent silent failures
         lines: "{{ lookup('template', '../templates/bgp/base_t0.j2').splitlines() }}"
-        comment: "Ansible: Configured eBGP Overlay"
+        comment: "Ansible: Configured {{ 'eBGP' if 'external' in (bgp.peers | map(attribute='type')) else 'iBGP' }} Overlay"
         # commit: no  (Defaults to yes)
       register: bgp_result
 

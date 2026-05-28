@@ -1,3 +1,6 @@
+{# Wipe existing BGP configuration to prevent conflicts #}
+delete protocols bgp
+
 {# Global BGP Autonomous System #}
 set routing-options autonomous-system {{ bgp.local_as }}
 
