@@ -9,9 +9,10 @@ interfaces:
 
 # BGP Overlay Configuration
 bgp:
-  local_as: 100
+  local_as: 600
   peers:
     - ip: "1.1.1.1"
-      group: "IBGP-OVERLAY"
-      type: "internal"
-      description: "iBGP to R1"
+      group: "EBGP-OVERLAY"
+      type: "external"
+      peer_as: 100
+      description: "eBGP to R1"
