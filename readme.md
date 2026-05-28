@@ -85,5 +85,6 @@ docker exec -i clab-bgp-multi-homed-R6 tcpdump -U -nni eth1 -w - > r6_r5_eth1.pc
 
 ##### Capturing from inside the node:
 admin@R1> monitor traffic interface ge-0/0/0.0
+admin@R1> monitor traffic interface ge-0/0/0.0 matching udp
 admin@R1> monitor traffic interface ge-0/0/0.0 matching tcp
 admin@R1> monitor traffic interface ge-0/0/0.0 matching "port 179"
