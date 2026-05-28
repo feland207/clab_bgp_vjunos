@@ -78,3 +78,7 @@ Run to find the network namespace (usally matches the container name):
 ip netns list
 Run to capture inter-nodes traffic:
 sudo ip netns exec clab-bgp-multi-homed-R2 tcpdump -nni eth2 -w r2_r3_eth2.pcap
+
+Or from remote laptop using docker context
+docker context use <your_popos_context>
+docker exec -i clab-bgp-multi-homed-R6 tcpdump -U -nni eth1 -w - > r6_r5_eth1.pcap

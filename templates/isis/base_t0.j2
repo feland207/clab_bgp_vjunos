@@ -10,6 +10,5 @@ set protocols isis interface lo0.0 passive
 {# P2P IS-IS interface settings #}
 {% for iface in interfaces %}
 set interfaces {{ iface.name }} unit 0 family iso
-set protocols isis interface {{ iface.name }} level 1
 set protocols isis interface {{ iface.name }}.0 point-to-point
 {% endfor %}
