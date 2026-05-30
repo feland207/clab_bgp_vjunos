@@ -4,6 +4,9 @@ isis_system_id: "0000.0000.6666"
 
 interfaces:
   - name: "ge-0/0/0"
+    ipv4_address: "100.100.46.2/30"
+    description: "Link to R4"
+  - name: "ge-0/0/1"
     ipv4_address: "100.100.56.2/30"
     description: "Link to R5"
 
