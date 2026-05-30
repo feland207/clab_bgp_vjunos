@@ -33,7 +33,7 @@ To-Do List:
 
 
 NOTE: This repo can be used as a playground for Terraform / Ansible. Find the clab topology in gdrive.
-
+```
 #### Directory structure
 .
 ├── ansible.cfg
@@ -56,7 +56,7 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 └── underlay
     ├── setup_p2p.yml                # Play for loopback0 and p2p interfaces
     └── setup_isis.yml               # Play for IS-IS interfaces, level-capability and iso address
-
+```
 #### How to capture pcaps
 
 ##### Capturing a VXLAN Tunnel payload (best to see just routing protocols):

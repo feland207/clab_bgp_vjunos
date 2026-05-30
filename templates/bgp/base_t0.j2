@@ -13,7 +13,7 @@ set protocols bgp group {{ peer.group }} type {{ peer.type }}
 {# Strip the /32 from the loopback variable for the local-address #}
 set protocols bgp group {{ peer.group }} local-address {{ loopback_ipv4.split('/')[0] }}
 
-{# Dynamically add multihop and peer-as for eBGP peering #}
+{# Always add multihop and peer-as for eBGP peering #}
 {% if peer.type == "external" %}
 set protocols bgp group {{ peer.group }} multihop
 set protocols bgp group {{ peer.group }} peer-as {{ peer.peer_as }}

@@ -1,5 +1,12 @@
 {# Interfaces and Routing Options Template #}
-set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }}
+set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }} primary
+
+{# Adding the target prefixes #}
+{% if prefixes is defined %}
+{% for prefix in prefixes %}
+set interfaces lo0 unit 0 family inet address {{ prefix }}
+{% endfor %}
+{% endif %}
 
 {# P2P interface settings #}
 {% for iface in interfaces %}

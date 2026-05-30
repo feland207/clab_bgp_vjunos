@@ -1,6 +1,9 @@
 ---
 loopback_ipv4: "6.6.6.6/32"
 isis_system_id: "0000.0000.6666"
+prefixes: 
+  - "10.6.6.6/24"
+  - "10.66.66.66/24"
 
 interfaces:
   - name: "ge-0/0/0"
@@ -17,5 +20,5 @@ bgp:
     - ip: "1.1.1.1"
       group: "IBGP-OVERLAY"
       type: "internal"
-      peer_as: 100
+      peer_as: 100          # Only used if peer.type == "external"
       description: "iBGP to R1"

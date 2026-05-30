@@ -14,3 +14,23 @@ interfaces:
     ipv4_address: "100.100.12.2/30"
     description: "Link to R1"
     ospf_area: "0.0.0.0"
+
+# BGP Overlay Configuration
+bgp:
+  local_as: 100
+  peers:
+    - ip: "1.1.1.1"
+      group: "IBGP-OVERLAY"
+      type: "internal"
+      peer_as: 600        # Only used if peer.type == "external"
+      description: "iBGP to R1"
+    - ip: "3.3.3.3"
+      group: "IBGP-OVERLAY"
+      type: "internal"
+      peer_as: 600        # Only used if peer.type == "external"
+      description: "iBGP to R3"
+    - ip: "100.100.24.2"
+      group: "EBGP-AS200"
+      type: "external"
+      peer_as: 200
+      description: "eBGP to R4"
