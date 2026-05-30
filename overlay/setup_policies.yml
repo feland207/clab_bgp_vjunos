@@ -25,7 +25,7 @@
         # Renders the template, splits to list, and drops empty lines to prevent silent failures
         lines: "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
         ignore_warning: "statement not found"
-        comment: "Ansible configured BGP policies in this groups: {{ bgp.groups | map(attribute='name') | unique | join(', ') }}"
+        comment: "Ansible configured routing policies: {{ policies | map(attribute='name') | unique | join(', ') }}"
         # commit: no  (Defaults to yes)
       register: policy_result
 

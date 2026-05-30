@@ -1,13 +1,26 @@
 {# Configure Policy Options #}
+{% if policies is defined %}
 {% for policy in policies %}
 {% for term in policy.terms %}
+
+{# Only render 'from protocol' if it exists in the YAML #}
+{% if term.from_protocol is defined %}
 set policy-options policy-statement {{ policy.name }} term {{ term.name }} from protocol {{ term.from_protocol }}
+{% endif %}
+
+{# Only iterate through 'route_filters' if they exist in the YAML #}
+{% if term.route_filters is defined %}
 {% for filter in term.route_filters %}
 set policy-options policy-statement {{ policy.name }} term {{ term.name }} from route-filter {{ filter }}
 {% endfor %}
+{% endif %}
+
+{# The 'then' statement is always required #}
 set policy-options policy-statement {{ policy.name }} term {{ term.name }} then {{ term.then }}
+
 {% endfor %}
 {% endfor %}
+{% endif %}
 
 {# Apply Policy in BGP Group #}
 {% for group in bgp.groups %}
