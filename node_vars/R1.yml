@@ -6,9 +6,11 @@ interfaces:
   - name: "ge-0/0/0"
     ipv4_address: "100.100.12.1/30"
     description: "Link to R2"
+    ospf_area: "0.0.0.0"
   - name: "ge-0/0/1"
     ipv4_address: "100.100.13.1/30"
     description: "Link to R3"
+    ospf_area: "0.0.0.0"
 
 # BGP Overlay Configuration
 bgp:

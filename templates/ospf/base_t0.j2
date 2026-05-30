@@ -1,0 +1,8 @@
+{# OSPF Configuration Template #}
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+
+{% for iface in interfaces %}
+{% if iface.ospf_area is defined %}
+set protocols ospf area {{ iface.ospf_area }} interface {{ iface.name }}.0 interface-type p2p
+{% endif %}
+{% endfor %}

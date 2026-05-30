@@ -17,7 +17,7 @@
         # Renders the template locally and splits it into a readable list
         msg: 
           - "#--- P2P IPv4 ---#"
-          - "{{ lookup('template', '../templates/isis/p2p_t0.j2').splitlines() }}"
+          - "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
           - "#--- IS-IS Level 1 ---#"
           - "{{ lookup('template', '../templates/isis/base_t0.j2').splitlines() }}"
 
@@ -26,7 +26,7 @@
         load: "set"       # Used for set-commands
         format: "set"     # Needed when using Jinja2 templates with set commands
         # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/isis/p2p_t0.j2').splitlines() }}"
+        lines: "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
         comment: "Ansible: Configured P2P IPv4 and Loopbacks"
         # commit: no
       register: p2p_result
