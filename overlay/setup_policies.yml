@@ -1,0 +1,38 @@
+---
+- name: "STAGE 2: Implement BGP Overlay"
+  hosts: all
+  connection: juniper.device.pyez
+  gather_facts: no
+
+  vars_files:
+    - ../secrets.yml
+
+  tasks:
+    - name: Load per-node static variables
+      ansible.builtin.include_vars:
+        file: "../node_vars/{{ inventory_hostname }}.yml"
+
+    - name: PREVIEW - Show rendered Policies configuration
+      ansible.builtin.debug:
+        msg: 
+          - "#--- BGP Policy ---#"
+          - "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
+
+    - name: Configure BGP Settings
+      juniper.device.config:
+        load: "set"
+        format: "set"
+        # Renders the template, splits to list, and drops empty lines to prevent silent failures
+        lines: "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
+        ignore_warning: "statement not found"
+        comment: "Ansible configured BGP policies in this groups: {{ bgp.groups | map(attribute='name') | unique | join(', ') }}"
+        # commit: no  (Defaults to yes)
+      register: policy_result
+
+    - name: Display Configuration Changes
+      ansible.builtin.debug:
+        # We use {{ item }} to force double interpolation of the variable names
+        var: "{{ item }}"
+      loop:
+        - policy_result.diff_lines
+      when: policy_result.changed

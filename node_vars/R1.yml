@@ -15,12 +15,24 @@ interfaces:
     description: "Link to R3"
     ospf_area: "0.0.0.0"
 
+# Define the routing policies
+policies:
+  - name: "EXPORT-LOOPBACK"
+    terms:
+      - name: "1"
+        from_protocol: "direct"
+        route_filters:
+          - "10.1.1.0/24 exact"
+          - "10.99.99.0/24 exact"
+        then: "accept"
+
 # BGP Overlay Configuration
 bgp:
   local_as: 100
   groups:
     - name: "IBGP-OVERLAY"
       type: "internal"
+      export_policy: "EXPORT-LOOPBACK"
       peers:
       - ip: "2.2.2.2"
         description: "iBGP to R2"

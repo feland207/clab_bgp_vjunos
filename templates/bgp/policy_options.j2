@@ -1,0 +1,17 @@
+{# Configure Policy Options #}
+{% for policy in policies %}
+{% for term in policy.terms %}
+set policy-options policy-statement {{ policy.name }} term {{ term.name }} from protocol {{ term.from_protocol }}
+{% for filter in term.route_filters %}
+set policy-options policy-statement {{ policy.name }} term {{ term.name }} from route-filter {{ filter }}
+{% endfor %}
+set policy-options policy-statement {{ policy.name }} term {{ term.name }} then {{ term.then }}
+{% endfor %}
+{% endfor %}
+
+{# Apply Policy in BGP Group #}
+{% for group in bgp.groups %}
+{% if group.export_policy is defined %}
+set protocols bgp group {{ group.name }} export {{ group.export_policy }}
+{% endif %}
+{% endfor %}

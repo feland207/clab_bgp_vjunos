@@ -15,12 +15,20 @@ interfaces:
     description: "Link to R1"
     ospf_area: "0.0.0.0"
 
+# Define the routing policies
+policies:
+  - name: "NEXT-HOP-SELF"
+    terms:
+      - name: "1"
+        then: "next-hop self"
+
 # BGP Overlay Configuration
 bgp:
   local_as: 100
   groups:
     - name: "IBGP-OVERLAY"
       type: "internal"
+      export_policy: "NEXT-HOP-SELF"
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"
