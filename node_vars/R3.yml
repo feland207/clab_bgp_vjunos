@@ -18,19 +18,18 @@ interfaces:
 # BGP Overlay Configuration
 bgp:
   local_as: 100
-  peers:
-    - ip: "1.1.1.1"
-      group: "IBGP-OVERLAY"
+  groups:
+    - name: "IBGP-OVERLAY"
       type: "internal"
-      peer_as: 600        # Only used if peer.type == "external"
-      description: "iBGP to R1"
-    - ip: "2.2.2.2"
-      group: "IBGP-OVERLAY"
-      type: "internal"
-      peer_as: 600        # Only used if peer.type == "external"
-      description: "iBGP to R2"
-    - ip: "100.100.35.2"
-      group: "EBGP-AS300"
+      peers:
+      - ip: "1.1.1.1"
+        description: "iBGP to R1"
+      - ip: "2.2.2.2"
+        description: "iBGP to R2"
+
+    - name: "EBGP-AS300"
       type: "external"
       peer_as: 300
-      description: "eBGP to R5"
+      peers:
+      - ip: "100.100.35.2"
+        description: "eBGP to R5"

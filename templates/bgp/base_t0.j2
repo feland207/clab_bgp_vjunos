@@ -1,25 +1,25 @@
 {# Wipe existing BGP configuration to prevent conflicts #}
 delete protocols bgp
 
-{# Global BGP Autonomous System #}
+{# Global Routing and BGP Settings #}
 set routing-options autonomous-system {{ bgp.local_as }}
+set protocols bgp local-address {{ loopback_ipv4.split('/')[0] }}
 
-{# Iterate through all defined BGP peers #}
-{% for peer in bgp.peers %}
+{# Iterate through all defined BGP groups #}
+{% for group in bgp.groups %}
 
-{# Define the group type (internal/external) #}
-set protocols bgp group {{ peer.group }} type {{ peer.type }}
+{# Set Group-Level Parameters #}
+set protocols bgp group {{ group.name }} type {{ group.type }}
 
-{# Strip the /32 from the loopback variable for the local-address #}
-set protocols bgp group {{ peer.group }} local-address {{ loopback_ipv4.split('/')[0] }}
-
-{# Always add multihop and peer-as for eBGP peering #}
-{% if peer.type == "external" %}
-set protocols bgp group {{ peer.group }} multihop
-set protocols bgp group {{ peer.group }} peer-as {{ peer.peer_as }}
+{# Always add multihop and peer-as for eBGP groups #}
+{% if group.type == "external" %}
+set protocols bgp group {{ group.name }} multihop
+set protocols bgp group {{ group.name }} peer-as {{ group.peer_as }}
 {% endif %}
 
-{# Define the specific neighbor and description #}
-set protocols bgp group {{ peer.group }} neighbor {{ peer.ip }} description "{{ peer.description }}"
+{# Iterate through the peers within this specific group #}
+{% for peer in group.peers %}
+set protocols bgp group {{ group.name }} neighbor {{ peer.ip }} description "{{ peer.description }}"
+{% endfor %}
 
 {% endfor %}
