@@ -1,9 +1,18 @@
+{# Interfaces and Routing Options Template #}
 set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }}
+
+{# P2P interface settings #}
 {% for iface in interfaces %}
 set interfaces {{ iface.name }} description "{{ iface.description }}"
-{# set interfaces {{ iface.name }} unit 0 family inet address {{ iface.ipv4_address }} #}
+{% if ip_unumbered | bool %}
 set interfaces {{ iface.name }} unit 0 family inet unnumbered-address lo0.0
+{% else %}
+set interfaces {{ iface.name }} unit 0 family inet address {{ iface.ipv4_address }}
+{% endif %}
 {% endfor %}
+
+{# Routing Options #}
+set routing-options router-id {{ loopback_ipv4.split('/')[0] }}
 
 {#
 Optional use of IP unnumbered.
