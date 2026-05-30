@@ -1,5 +1,5 @@
 ---
-- name: "STAGE 1: Implement OSPF Underlay"
+- name: "STAGE 0: Implement P2P interfaces + Prefixes"
   hosts: all
   connection: juniper.device.pyez
   gather_facts: no
@@ -12,31 +12,30 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered P2P IPv4 and OSPF configuration
+    - name: PREVIEW - Show rendered P2P IPv4 and IS-IS configuration
       ansible.builtin.debug:
         # Renders the template locally and splits it into a readable list
         msg: 
-          - "#--- OSPF Area 0 ---#"
-          - "{{ lookup('template', '../templates/ospf/base_t0.j2').splitlines() }}"
+          - "#--- P2P IPv4 ---#"
+          - "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
 
-    - name: Configure OSPF Area 0
+    - name: Configure P2P IPv4, Loopbacks and Prefixes
       juniper.device.config:
-        load: "set"       # set performs a merge operation behind the scenes.
-        format: "set"
-        # We define the loopback address, router-id and ospf protocol
+        load: "set"       # Used for set-commands
+        format: "set"     # Needed when using Jinja2 templates with set commands
         # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/ospf/base_t0.j2').splitlines() }}"
-        comment: "Ansible: Configured OSPF Area 0"
+        lines: "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
+        comment: "Ansible: Configured P2P IPv4, Loopbacks and Prefixes"
         # commit: no
-      register: ospf_result
+      register: p2p_result
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
         var: "{{ item }}"
       loop:
-        - ospf_result.diff_lines
+        - p2p_result.diff_lines
       # Only show the debug if something actually changed
-      when: ospf_result.changed
+      when: p2p_result.changed
 
 # Sanity check
 # ansible R2 -i inventory.ini -e "@node_vars/R2.yml" -m debug -a "var=interfaces"

@@ -12,13 +12,39 @@ interfaces:
   - name: "ge-0/0/1"
     ipv4_address: "100.100.56.2/30"
     description: "Link to R5"
+    ospf_area: "0.0.0.0"
+
+# Define the routing policies
+policies:
+  - name: "EXPORT-LOOPBACK"
+    terms:
+      - name: "1"
+        from_protocol: "direct"
+        route_filters:
+          - "10.6.6.0/24 exact"
+          - "10.66.66.0/24 exact"
+        then: "accept"
+
+  - name: "NEXT-HOP-SELF"
+    terms:
+      - name: "1"
+        then: "next-hop self"
 
 # BGP Overlay Configuration
 bgp:
-  local_as: 100
-  peers:
-    - ip: "1.1.1.1"
-      group: "IBGP-OVERLAY"
+  local_as: 300
+  groups:
+    - name: "IBGP-AS300"
       type: "internal"
-      peer_as: 100          # Only used if peer.type == "external"
-      description: "iBGP to R1"
+      export_policy: "[ EXPORT-LOOPBACK NEXT-HOP-SELF ]"    # Junos bracket syntax for chaining policies
+      peers:
+      - ip: "5.5.5.5"
+        description: "iBGP to R5"
+
+    - name: "EBGP-AS200"
+      type: "external"
+      peer_as: 200
+      export_policy: "EXPORT-LOOPBACK"
+      peers:
+      - ip: "100.100.46.1"
+        description: "eBGP to R4"

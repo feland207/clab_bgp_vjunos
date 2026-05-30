@@ -3,7 +3,6 @@ delete protocols bgp
 
 {# Global Routing and BGP Settings #}
 set routing-options autonomous-system {{ bgp.local_as }}
-set protocols bgp local-address {{ loopback_ipv4.split('/')[0] }}
 
 {# Iterate through all defined BGP groups #}
 {% for group in bgp.groups %}
@@ -11,7 +10,12 @@ set protocols bgp local-address {{ loopback_ipv4.split('/')[0] }}
 {# Set Group-Level Parameters #}
 set protocols bgp group {{ group.name }} type {{ group.type }}
 
-{# Always add multihop and peer-as for eBGP groups #}
+{# Configure iBGP parameters local-address. For eBGP naturally defaults to the physical P2P IP #}
+{% if group.type == "internal" %}
+set protocols bgp group {{ group.name }} local-address {{ loopback_ipv4.split('/')[0] }}
+{% endif %}
+
+{# Configure eBGP specific parameters #}
 {% if group.type == "external" %}
 set protocols bgp group {{ group.name }} multihop
 set protocols bgp group {{ group.name }} peer-as {{ group.peer_as }}

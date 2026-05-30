@@ -12,3 +12,20 @@ interfaces:
   # - name: "ge-0/0/2"
   #   ipv4_address: "100.100.45.1/30"
   #   description: "Link to R5"
+
+# BGP Overlay Configuration
+bgp:
+  local_as: 200
+  groups:
+    - name: "EBGP-AS100"
+      type: "external"
+      peer_as: 100
+      peers:
+      - ip: "100.100.24.1"
+        description: "eBGP to R2"
+    - name: "EBGP-AS300"
+      type: "external"
+      peer_as: 300
+      peers:
+      - ip: "100.100.46.2"
+        description: "eBGP to R6"

@@ -28,6 +28,7 @@
         comment: "Ansible configured routing policies: {{ policies | map(attribute='name') | unique | join(', ') }}"
         # commit: no  (Defaults to yes)
       register: policy_result
+      when: policies is defined
 
     - name: Display Configuration Changes
       ansible.builtin.debug:

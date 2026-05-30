@@ -9,3 +9,29 @@ interfaces:
   - name: "ge-0/0/1"
     ipv4_address: "100.100.56.1/30"
     description: "Link to R6"
+    ospf_area: "0.0.0.0"
+
+# Define the routing policies
+policies:
+  - name: "NEXT-HOP-SELF"
+    terms:
+      - name: "1"
+        then: "next-hop self"
+
+# BGP Overlay Configuration
+bgp:
+  local_as: 300
+  groups:
+    - name: "IBGP-AS300"
+      type: "internal"
+      export_policy: "NEXT-HOP-SELF"
+      peers:
+      - ip: "6.6.6.6"
+        description: "iBGP to R6"
+
+    - name: "EBGP-AS100"
+      type: "external"
+      peer_as: 100
+      peers:
+      - ip: "100.100.35.1"
+        description: "eBGP to R3"
