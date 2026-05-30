@@ -38,12 +38,12 @@ NOTE: This repo can be used as a playground for Terraform / Ansible. Find the cl
 .
 ├── ansible.cfg
 ├── inventory.ini
-├── run_command.yml				# Run custom command play
+├── run_command.yml				# Run custom command
 ├── secrets.yml
 ├── templates
 │   └── isis
-|       ├── p2p_t0.j2              # Jinja2 template for loopback0 and p2p interfaces
-│       └── base_t0.j2             # Jinja2 template for IS-IS interfaces, level-capability and iso address
+|       ├── p2p_t0.j2              # Template for loopback0 and p2p interfaces
+│       └── base_t0.j2             # Template for IS-IS interfaces, level-capability and iso address
 ├── group_vars/
 │   └── all.yml                    # Global variables (e.g., IS-IS ISO NET Address, IS-IS area)
 ├── node_vars/                     # Static YAML files containing per-node data
@@ -88,3 +88,6 @@ admin@R1> monitor traffic interface ge-0/0/0.0
 admin@R1> monitor traffic interface ge-0/0/0.0 matching udp
 admin@R1> monitor traffic interface ge-0/0/0.0 matching tcp
 admin@R1> monitor traffic interface ge-0/0/0.0 matching "port 179"
+
+##### ACIIFlow topology
+[link](https://asciiflow.com/#/share/eJzdV7FuwjAQ%2FZXIM4XYTmibP%2BjSIUMnSyiRIoTU0ipEFQghVZk7dMjA0LEjI1%2FEl9QQgqhzvtgRraImQbGPu3dnx%2B%2FJXpJp9JSQgDxG8Sgev4yiLEsn8Yz0pGWRpPKfpSCvSTqbPE8FCVhPkLl8395w2VrsLddD2cqSeSY7gjiaa1e874o39PnQxTqOEFPVNE6u3IG8d0V%2BniU%2F2qkJCFrU194jHJZ%2Bn7bFQ8lyoIl1TICKpsLWrcHh6%2FdAqOv29z9v2HcH3DUBqUL8MqRTw%2BkcSMUMExCFReeVQKTZGjC5FrdFSPQzIUoQ3AcACr1moNA3ALpERXX%2BbrT8dfRxmxrMGkgIaqam%2BMoXqBodN%2BbQKZBKO5hnLTfcV%2BTm4f4ucJhnBHLw5d7%2Fndhj61KLzUo3WoYpCbU7ClBCdeQ%2BaQkrO417COQpNyPcJN1Z57TE%2BWG9GoqSnbq0DKutE2axThhUdX0ONCCKpVMg1RejzFqUKIdEiTJzUaL8D0XJ6kBgCt54KDADwjfVJRdp6YqTWqUJcI6Bx4hNNw5icyBQgcmKrL4BoJDpGA%3D%3D))

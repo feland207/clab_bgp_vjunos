@@ -1,4 +1,4 @@
-name: bgp-multi-homed
+name: bgp-multi-as
 
 mgmt:
   network: custom-mgmt
@@ -64,17 +64,16 @@ topology:
 
 
 #--- CORE to EDGEs ---
-# | VNI 120 | R1 ge-0/0/0: 100.100.12.1/30 | R2 ge-0/0/0: 100.100.12.2/30 |
-# | VNI 130 | R1 ge-0/0/1: 100.100.13.1/30 | R3 ge-0/0/0: 100.100.13.2/30 |
+# | VNI 120 | R1 ge-0/0/0: 100.100.12.1/30 | R2 ge-0/0/2: 100.100.12.2/30 |
+# | VNI 130 | R1 ge-0/0/1: 100.100.13.1/30 | R3 ge-0/0/2: 100.100.13.2/30 |
 
 # Bridge our Popos veth interface to Debian laptop
 # clab tools vxlan create --remote 192.168.1.160 --link r1tor2_id120 --id 120
 # clab tools vxlan create --remote 192.168.1.160 --link r1tor3_id130 --id 130
 
-
 #--- ISP to EDGEs ---
-# | VNI 240 | R2 ge-0/0/1: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
-# | VNI 340 | R3 ge-0/0/1: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
+# | VNI 240 | R2 ge-0/0/0: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
+# | VNI 340 | R3 ge-0/0/0: 100.100.34.1/30 | R4 ge-0/0/1: 100.100.34.2/30 |
 
 # Bridge our Popos veth interface to Debian laptop
 # clab tools vxlan create --remote 192.168.1.160 --link r4tor2_id240 --id 240

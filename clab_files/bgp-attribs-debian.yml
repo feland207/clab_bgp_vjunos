@@ -1,0 +1,63 @@
+name: bgp-attribs
+
+mgmt:
+  network: custom-mgmt
+  ipv4-subnet: 172.50.50.0/24
+
+topology:
+  kinds:
+    juniper_vjunosswitch:
+      image: vrnetlab/juniper_vjunos-switch:25.4R1.12       # The image we built
+      cpu: 2                                                # Prevents GUI freezing
+      memory: 3584Mi                                        # Protects our available RAM
+
+  nodes:
+    #--- EDGEs ROUTERS ---
+    R2:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.50.50.20
+      startup-delay: 60
+
+    R3:
+      kind: juniper_vjunosswitch
+      mgmt-ipv4: 172.50.50.30
+      startup-delay: 120
+
+  links:
+    # Setting Linux veth MTU to 9100
+    #--- EDGEs to ISPs ---
+    - endpoints: ["R2:eth1", "host:r2tor4_id240"]
+      mtu: 9100
+    - endpoints: ["R3:eth1", "host:r3tor5_id350"]
+      mtu: 9100
+
+    #--- Interchassis EDGEs ---
+    - endpoints: ["R2:eth2", "R3:eth2"]
+      mtu: 9100
+
+    #--- EDGEs to CORE ---
+    - endpoints: ["R2:eth3", "host:r2tor1_id120"]
+      mtu: 9100
+    - endpoints: ["R3:eth3", "host:r3tor1_id130"]
+      mtu: 9100
+
+
+#--- EDGEs to ISPs ---
+# | VNI 240 | R2 ge-0/0/0: 100.100.24.1/30 | R4 ge-0/0/0: 100.100.24.2/30 |
+# | VNI 350 | R3 ge-0/0/0: 100.100.35.1/30 | R5 ge-0/0/0: 100.100.35.2/30 |
+
+# Bridge our Debian veth interface to Popos laptop
+# clab tools vxlan create --remote 192.168.1.63 --link r2tor4_id240 --id 240
+# clab tools vxlan create --remote 192.168.1.63 --link r3tor5_id350 --id 350
+
+#--- EDGEs to CORE ---
+# | VNI 120 | R1 ge-0/0/0: 100.100.12.1/30 | R2 ge-0/0/2: 100.100.12.2/30 |
+# | VNI 130 | R1 ge-0/0/1: 100.100.13.1/30 | R3 ge-0/0/2: 100.100.13.2/30 |
+
+# Bridge our Debian veth interface to Popos laptop
+# clab tools vxlan create --remote 192.168.1.63 --link r2tor1_id120 --id 120
+# clab tools vxlan create --remote 192.168.1.63 --link r3tor1_id130 --id 130
+
+# Static route to reach Popos mgmt
+# sudo ip route add 172.60.60.0/24 via 192.168.1.63
+
