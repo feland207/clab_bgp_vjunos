@@ -91,3 +91,23 @@ admin@R1> monitor traffic interface ge-0/0/0.0 matching "port 179"
 
 ##### ACIIFlow topology
 [link](https://asciiflow.com/#/share/eJzdV7FuwjAQ%2FZXIM4XYTmibP%2BjSIUMnSyiRIoTU0ipEFQghVZk7dMjA0LEjI1%2FEl9QQgqhzvtgRraImQbGPu3dnx%2B%2FJXpJp9JSQgDxG8Sgev4yiLEsn8Yz0pGWRpPKfpSCvSTqbPE8FCVhPkLl8395w2VrsLddD2cqSeSY7gjiaa1e874o39PnQxTqOEFPVNE6u3IG8d0V%2BniU%2F2qkJCFrU194jHJZ%2Bn7bFQ8lyoIl1TICKpsLWrcHh6%2FdAqOv29z9v2HcH3DUBqUL8MqRTw%2BkcSMUMExCFReeVQKTZGjC5FrdFSPQzIUoQ3AcACr1moNA3ALpERXX%2BbrT8dfRxmxrMGkgIaqam%2BMoXqBodN%2BbQKZBKO5hnLTfcV%2BTm4f4ucJhnBHLw5d7%2Fndhj61KLzUo3WoYpCbU7ClBCdeQ%2BaQkrO417COQpNyPcJN1Z57TE%2BWG9GoqSnbq0DKutE2axThhUdX0ONCCKpVMg1RejzFqUKIdEiTJzUaL8D0XJ6kBgCt54KDADwjfVJRdp6YqTWqUJcI6Bx4hNNw5icyBQgcmKrL4BoJDpGA%3D%3D)
+
+
+#### Known bugs:
+When playing 'run_command.yml' => Type 'bool' cannot be serialized
+
+1. Why show ospf interface works but neighbor fails
+
+When you run show ospf interface, your router has OSPF enabled on its loopback and links, so it returns a block of text. The PyEZ library converts that text into a string, serializes it, and sends it back to Ansible successfully.
+
+When you run show ospf neighbor, the table is completely empty. Instead of returning an empty string "", the underlying PyEZ Python library interprets a successful command with zero output as the boolean value True. Ansible attempts to send this True back over its local JSON socket, crashes, and throws the exact error you see: Type 'bool' cannot be serialized.
+
+2. Why the previous fix appeared to fail
+
+If you look closely at your traceback, it says:
+File "/tmp/.../ansible_collections/juniper/device/plugins/modules/command.py"
+
+This proves that Ansible is still executing the juniper.device.command module.
+If you simply swapped formats: "text" to display: "text" without fully changing the module to junipernetworks.junos.junos_command AND changing the connection plugin at the top of the playbook to netconf, it will fail. The core Ansible modules (junipernetworks) strictly require the netconf or network_cli connection plugins; they cannot run over juniper.device.pyez.
+
+Once you make these swaps, running show ospf neighbor will succeed, bypass the boolean crash, and cleanly save a log file containing "No output returned" (or an empty string) instead of halting the playbook.

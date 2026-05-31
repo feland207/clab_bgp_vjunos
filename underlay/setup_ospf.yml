@@ -12,7 +12,7 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered P2P IPv4 and OSPF configuration
+    - name: PREVIEW - Show rendered OSPF configuration
       ansible.builtin.debug:
         # Renders the template locally and splits it into a readable list
         msg: 
@@ -44,3 +44,6 @@
 
 # Source Link:
 # https://www.juniper.net/documentation/us/en/software/junos-ansible/ansible/topics/topic-map/junos-ansible-configuration-retrieving.html
+# https://www.juniper.net/documentation/us/en/software/junos-ansible/ansible/topics/topic-map/junos-ansible-commands-rpcs-executing.html
+# https://galaxy.ansible.com/ui/repo/published/juniper/device/content/module/command/
+# https://docs.ansible.com/ansible/latest/collections/junipernetworks/junos/junos_command_module.html#parameter-display

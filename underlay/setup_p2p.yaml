@@ -12,7 +12,7 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered P2P IPv4 and IS-IS configuration
+    - name: PREVIEW - Show rendered P2P IPv4 configuration
       ansible.builtin.debug:
         # Renders the template locally and splits it into a readable list
         msg: 

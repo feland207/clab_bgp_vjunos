@@ -56,3 +56,5 @@
     #     label: "Line"
 
     # ansible-playbook run_command.yml -l ISP-A | tee debug_run.log
+
+    # Bugs: Type 'bool' cannot be serialized when show command does not return anything; See readme.md

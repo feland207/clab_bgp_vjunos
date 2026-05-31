@@ -17,11 +17,13 @@ topology:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.50.50.20
       startup-delay: 60
+      startup-config: ../startup-configs/R2.conf
 
     R3:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.50.50.30
       startup-delay: 120
+      startup-config: ../startup-configs/R3.conf
 
   links:
     # Setting Linux veth MTU to 9100

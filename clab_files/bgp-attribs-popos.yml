@@ -17,23 +17,26 @@ topology:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.60.60.10
       startup-delay: 60
+      startup-config: ../startup-configs/R1.conf
 
     #--- ISPs ROUTERS ---
     R4:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.60.60.40
       startup-delay: 120
+      startup-config: ../startup-configs/R4.conf
     R5:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.60.60.50
       startup-delay: 180
+      startup-config: ../startup-configs/R5.conf
 
     #--- AS300 ROUTER ---
     R6:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.60.60.60
       startup-delay: 220
-
+      startup-config: ../startup-configs/R6.conf
 
   links:
     # Setting Linux veth MTU to 9100
