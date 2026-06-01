@@ -44,7 +44,7 @@ bgp:
   groups:
     - name: "IBGP-OVERLAY"
       type: "internal"
-      export_policy: "NEXT-HOP-SELF"
+      # export_policy: "NEXT-HOP-SELF"
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"

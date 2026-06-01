@@ -24,6 +24,7 @@ policies:
         route_filters:
           - "10.1.1.0/24 exact"
           - "10.99.99.0/24 exact"
+        # as_path_prepend: "900 900 900"
         then: "accept"
 
   - name: "NEXT-HOP-SELF"

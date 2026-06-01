@@ -26,6 +26,8 @@
         lines: "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
         ignore_warning: "statement not found"
         comment: "Ansible configured routing policies: {{ policies | map(attribute='name') | unique | join(', ') }}"
+        # ignore_warning is to accept the Junos warning gracefully if it tries to delete a config that was already removed in a previous run
+        # ignore_warning: "statement not found"
         # commit: no  (Defaults to yes)
       register: policy_result
       when: policies is defined
