@@ -2,8 +2,26 @@
 loopback_ipv4: "1.1.1.1/32"
 isis_system_id: "0000.0000.1111"
 prefixes: 
-  - "10.1.1.1/24"
-  - "10.99.99.99/24"
+  - prefix: "10.1.1.1/24"
+    action: "set"
+  - prefix: "10.99.99.99/24"
+    action: "set"
+
+# static routes definition
+static_routes:
+  - prefix: "10.1.1.0/24"
+    action: "discard"
+    state: "absent"
+  - prefix: "10.99.99.0/24"
+    action: "discard"
+    state: "absent"
+  - prefix: "10.1.1.1/32"
+    action: "receive"
+    state: "absent"
+  - prefix: "10.99.99.99/32"
+    action: "receive"
+    # if state is omitted, it defaults to present and generates a 'set' command
+    state: "absent"
 
 interfaces:
   - name: "ge-0/0/0"
@@ -20,7 +38,7 @@ policies:
   - name: "EXPORT-LOOPBACK"
     terms:
       - name: "1"
-        from_protocol: "direct"
+        from_protocol: "[ direct static ]"
         route_filters:
           - "10.1.1.0/24 exact"
           - "10.99.99.0/24 exact"

@@ -26,5 +26,8 @@ set policy-options policy-statement {{ policy.name }} term {{ term.name }} then 
 {% for group in bgp.groups %}
 {% if group.export_policy is defined %}
 set protocols bgp group {{ group.name }} export {{ group.export_policy }}
+{% else %}
+{# If no policy is defined, ensure any old policy is removed #}
+delete protocols bgp group {{ group.name }} export
 {% endif %}
 {% endfor %}

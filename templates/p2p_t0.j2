@@ -4,7 +4,21 @@ set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }} primary
 {# Adding the target prefixes #}
 {% if prefixes is defined %}
 {% for prefix in prefixes %}
-set interfaces lo0 unit 0 family inet address {{ prefix }}
+{{ prefix.action }} interfaces lo0 unit 0 family inet address {{ prefix.prefix }}
+{% endfor %}
+{% endif %}
+
+{# Configure or Delete static routes (Discard / Receive) #}
+{% if static_routes is defined %}
+{% for route in static_routes %}
+
+{# Check if the route is marked for deletion #}
+{% if route.state | default('present') == 'absent' %}
+delete routing-options static route {{ route.prefix }}
+{% else %}
+set routing-options static route {{ route.prefix }} {{ route.action }}
+{% endif %}
+
 {% endfor %}
 {% endif %}
 

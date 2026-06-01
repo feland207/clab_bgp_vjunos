@@ -17,6 +17,15 @@ interfaces:
 
 # Define the routing policies
 policies:
+  - name: "EXPORT-OSPF-TO-EBGP"
+    terms:
+      - name: "1"
+        from_protocol: "ospf"
+        route_filters:
+          - "10.1.1.0/24 exact"
+          - "10.99.99.0/24 exact"
+        then: "accept"
+
   - name: "NEXT-HOP-SELF"
     terms:
       - name: "1"
@@ -38,6 +47,7 @@ bgp:
     - name: "EBGP-AS200"
       type: "external"
       peer_as: 200
+      export_policy: "EXPORT-OSPF-TO-EBGP"
       peers:
       - ip: "100.100.24.2"
         description: "eBGP to R4"
