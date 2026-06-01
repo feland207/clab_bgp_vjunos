@@ -26,6 +26,13 @@ policies:
           - "10.99.99.0/24 exact"
         then: "accept"
 
+  - name: "SET-LOCAL-PREF"
+    terms:
+      - name: "1"
+        from_protocol: "bgp"
+        local_preference: 101
+        then: "accept"
+
   - name: "NEXT-HOP-SELF"
     terms:
       - name: "1"
@@ -47,6 +54,7 @@ bgp:
     - name: "EBGP-AS200"
       type: "external"
       peer_as: 200
+      import_policy: "SET-LOCAL-PREF"
       export_policy: "EXPORT-OSPF-TO-EBGP"
       peers:
       - ip: "100.100.24.2"

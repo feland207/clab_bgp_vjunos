@@ -15,6 +15,11 @@ set policy-options policy-statement {{ policy.name }} term {{ term.name }} from 
 {% endfor %}
 {% endif %}
 
+{# Action: Local Preference #}
+{% if term.local_preference is defined %}
+set policy-options policy-statement {{ policy.name }} term {{ term.name }} then local-preference {{ term.local_preference }}
+{% endif %}
+
 {# The 'then' statement is always required #}
 set policy-options policy-statement {{ policy.name }} term {{ term.name }} then {{ term.then }}
 
@@ -22,12 +27,22 @@ set policy-options policy-statement {{ policy.name }} term {{ term.name }} then 
 {% endfor %}
 {% endif %}
 
-{# Apply Policy in BGP Group #}
 {% for group in bgp.groups %}
+
+{# Export Policy Handling #}
 {% if group.export_policy is defined %}
 set protocols bgp group {{ group.name }} export {{ group.export_policy }}
 {% else %}
 {# If no policy is defined, ensure any old policy is removed #}
 delete protocols bgp group {{ group.name }} export
 {% endif %}
+
+{# Import Policy Handling #}
+{% if group.import_policy is defined %}
+set protocols bgp group {{ group.name }} import {{ group.import_policy }}
+{% else %}
+{# If no policy is defined, ensure any old policy is removed #}
+delete protocols bgp group {{ group.name }} import
+{% endif %}
+
 {% endfor %}

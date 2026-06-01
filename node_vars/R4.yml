@@ -23,6 +23,7 @@ bgp:
       peers:
       - ip: "100.100.24.1"
         description: "eBGP to R2"
+
     - name: "EBGP-AS300"
       type: "external"
       peer_as: 300
