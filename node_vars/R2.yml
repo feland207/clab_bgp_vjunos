@@ -17,7 +17,7 @@ interfaces:
 
 aggregate_routes:
   - prefix: "10.6.6.0/24"
-    state: "present"
+    state: "absent"
 
 # Define the routing policies
 policies:
@@ -54,7 +54,7 @@ bgp:
   groups:
     - name: "IBGP-OVERLAY"
       type: "internal"
-      export_policy: "[ NEXT-HOP-SELF ]"
+      export_policy: "[ NEXT-HOP-SELF EXPORT-AGGREGATE ]"
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"
