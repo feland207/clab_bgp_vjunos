@@ -15,6 +15,10 @@ interfaces:
     description: "Link to R1"
     ospf_area: "0.0.0.0"
 
+aggregate_routes:
+  - prefix: "10.6.6.0/24"
+    state: "present"
+
 # Define the routing policies
 policies:
   - name: "EXPORT-OSPF-TO-EBGP"
@@ -30,7 +34,13 @@ policies:
     terms:
       - name: "1"
         from_protocol: "bgp"
-        local_preference: 101
+        local_preference: 99
+        then: "accept"
+
+  - name: "EXPORT-AGGREGATE"
+    terms:
+      - name: "1"
+        from_protocol: "aggregate"
         then: "accept"
 
   - name: "NEXT-HOP-SELF"
@@ -44,7 +54,7 @@ bgp:
   groups:
     - name: "IBGP-OVERLAY"
       type: "internal"
-      # export_policy: "NEXT-HOP-SELF"
+      export_policy: "[ NEXT-HOP-SELF ]"
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"

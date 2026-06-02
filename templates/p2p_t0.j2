@@ -22,6 +22,20 @@ set routing-options static route {{ route.prefix }} {{ route.action }}
 {% endfor %}
 {% endif %}
 
+{# Configure or Delete aggregate routes #}
+{% if aggregate_routes is defined %}
+{% for route in aggregate_routes %}
+
+{# Check if the route is marked for deletion #}
+{% if route.state | default('present') == 'absent' %}
+delete routing-options aggregate route {{ route.prefix }}
+{% else %}
+set routing-options aggregate route {{ route.prefix }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
 {# P2P interface settings #}
 {% for iface in interfaces %}
 set interfaces {{ iface.name }} description "{{ iface.description }}"
