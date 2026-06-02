@@ -27,7 +27,7 @@
         lines: "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
         comment: "Ansible: Configured P2P IPv4, Loopbacks and Prefixes"
         # ignore_warning is to accept the Junos warning gracefully if it tries to delete a config that was already removed in a previous run
-        # ignore_warning: "statement not found"
+        ignore_warning: "statement not found"
         # commit: no
       register: p2p_result
 
