@@ -1,9 +1,11 @@
 ---
 loopback_ipv4: "6.6.6.6/32"
 isis_system_id: "0000.0000.6666"
-prefixes: 
-  - "10.6.6.6/24"
-  - "10.66.66.66/24"
+prefixes:
+  - prefix: "10.6.6.6/24"
+    action: "set"
+  - prefix: "10.66.66.66/24"
+    action: "set"
 
 interfaces:
   - name: "ge-0/0/0"
