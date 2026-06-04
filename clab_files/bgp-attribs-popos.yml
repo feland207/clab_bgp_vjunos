@@ -18,6 +18,9 @@ topology:
       mgmt-ipv4: 172.60.60.10
       startup-delay: 60
       startup-config: ../startup-configs/R1.conf
+      # Port binding for vJunos REST API
+      ports:
+        - "3001:3000"
 
     #--- ISPs ROUTERS ---
     R4:
@@ -25,11 +28,17 @@ topology:
       mgmt-ipv4: 172.60.60.40
       startup-delay: 120
       startup-config: ../startup-configs/R4.conf
+      # Port binding for vJunos REST API
+      ports:
+        - "3004:3000"
     R5:
       kind: juniper_vjunosswitch
       mgmt-ipv4: 172.60.60.50
       startup-delay: 180
       startup-config: ../startup-configs/R5.conf
+      # Port binding for vJunos REST API
+      ports:
+        - "3005:3000"
 
     #--- AS300 ROUTER ---
     R6:
@@ -37,6 +46,9 @@ topology:
       mgmt-ipv4: 172.60.60.60
       startup-delay: 220
       startup-config: ../startup-configs/R6.conf
+      # Port binding for vJunos REST API
+      ports:
+        - "3006:3000"
 
   links:
     # Setting Linux veth MTU to 9100
@@ -78,3 +90,15 @@ topology:
 # Static route to reach Debian mgmt
 # sudo ip route add 172.50.50.0/24 via 192.168.1.160
 
+# Ports listening after clab
+# sudo netstat -plnt
+
+# Capture local port to see if packets are going out
+# sudo tcpdump -i any port 3002 -n -v
+
+# From Debian to Popos. Binding ports between laptops with this SSH command should not be needed if we use docker context; Double-check
+# This is for vJunos REST API
+# ssh -4 -L 127.0.0.1:3000:172.60.60.60:3000 fandre@192.168.1.63
+
+# Test vJunos REST API with curl
+# curl -4 -vvvv -u "admin:admin123" -H "Accept: application/json" "http://127.0.0.1:3002/rpc/get-configuration?format=json"

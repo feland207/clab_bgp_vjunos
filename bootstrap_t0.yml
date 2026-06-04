@@ -34,6 +34,13 @@
           - set system time-zone Europe/Paris
           - 'set system root-authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
           - 'set system login user admin authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
+          # --- Add the native REST API lines ---
+          # - set system services rest http addresses 0.0.0.0
+          - set system services rest http addresses {{ ansible_host }}
+          # Port 3000 is a custom, unprivileged port, the Docker container is not listening for it unless we map it at the container creation.
+          - set system services rest http port 3000
+          - set system services rest routing-instance mgmt_junos
+          - set system services rest enable-explorer
         comment: Updating credentials t0 stage
       tags: credentials
       register: response
