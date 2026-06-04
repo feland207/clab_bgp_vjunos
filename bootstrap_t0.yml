@@ -32,6 +32,7 @@
         load: "set"
         lines:
           - set system time-zone Europe/Paris
+          - set system services ssh sftp-server
           - 'set system root-authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
           - 'set system login user admin authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
           # --- Add the native REST API lines; address 0.0.0.0 OR ansible_host ---
