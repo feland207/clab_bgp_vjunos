@@ -1,7 +1,7 @@
 ---
 - name: Collect backup config
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars:
@@ -19,8 +19,14 @@
         path: backups
         state: directory
 
-    - name: Execute show configuration
-      juniper.device.command:
+    - name: Execute show running-config
+      cisco.iosxr.iosxr_command:
         commands:
-          - show configuration
+          - show running-config
+      register: config_output
+
+    - name: Save config to file
+      ansible.builtin.copy:
+        content: "{{ config_output.stdout[0] }}"
         dest: "{{ playbook_dir }}/backups/{{ inventory_hostname }}.conf"
+      delegate_to: localhost
