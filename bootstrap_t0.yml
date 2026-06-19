@@ -1,57 +1,62 @@
 ---
-- name: Overwrite Junos Credentials and save backup config
+- name: Overwrite IOS XR Credentials and save backup config
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_prompt:
     # T0 login username
-    - name: user
+    - name: ansible_user
       prompt: Enter username
       private: false
 
     # T0 login password
-    - name: passwd
+    - name: ansible_password
       prompt: Enter password
       private: true
 
   vars:
-    wait_time: 60
+    # Optional: Prevents paramiko SSH timeout on slow XRv initial commits
+    ansible_command_timeout: 120
     log_dir: ./log/ansible
+
+    # Force SSH to use password auth instead of failing on keyboard-interactive
+    # ansible_ssh_common_args: '-o PreferredAuthentications=password'
 
   tasks:
     - name: Create local configs directory
       delegate_to: localhost
       run_once: true
-      file:
+      ansible.builtin.file:
         path: startup-configs
         state: directory
 
-    - name: Update root and admin passwords
-      juniper.device.config:
-        load: "set"
+    - name: Load Day-1 credentials from vault without overwriting SSH connection vars
+      ansible.builtin.include_vars:
+        file: secrets.yml
+        name: vault_creds
+
+    - name: Update time-zone, admin passwords and enable management APIs
+      cisco.iosxr.iosxr_config:
         lines:
-          - set system time-zone Europe/Paris
-          - set system services ssh sftp-server
-          - 'set system root-authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
-          - 'set system login user admin authentication encrypted-password "$6$c8BihofeHqDeBP89$B7Z06W3M4vwsGCqtAma6gC9MfoLRi.Jupo5j4mkaBEf4QbfZSepXcwe/emwXq5zpeJC/3/NTghTOp2QGMVW7A/"'
-          # --- Add the native REST API lines; address 0.0.0.0 OR ansible_host ---
-          # - set system services rest http addresses 0.0.0.0
-          # - set system services rest http addresses {{ ansible_host }}
+          # Central European Timezone
+          - clock timezone CET 1
+          - clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
 
-          # Not sure if needed when binding addresses 0.0.0.0
-          # - set system services rest routing-instance mgmt_junos
+          # Create admin user, assign privileges, and set secret from vault
+          - username {{ vault_creds.ansible_user }} group root-lr
+          - username {{ vault_creds.ansible_user }} secret {{ vault_creds.ansible_password }}
 
-          # Port 3000 is a custom, unprivileged port, the Docker container is not listening for it unless we map it at the container creation.
-          - set system services rest http port 3000
-          - set system services rest enable-explorer
-        comment: Updating credentials t0 stage
-      tags: credentials
+          # Enable necessary management protocols
+          - ssh server v2
+          - ssh server netconf vrf clab-mgmt      # Tells SSH to allow NETCONF subsystem
+          - netconf-yang agent ssh                # Completes the netconf-yang command
+          - xml agent tty
       register: response
 
     - name: "Print the config changes"
       ansible.builtin.debug:
-        var: response.diff_lines
+        var: response.updates
 
     # Only needed if we use connection: local
     # - name: Force refresh of the Netconf session (Not needed when using connection: juniper.device.pyez)
@@ -59,12 +64,18 @@
     #   set_fact:
     #     ansible_password: admin123
 
-    - name: Save configuration
-      juniper.device.command:
+    - name: Fetch running configuration for backup
+      cisco.iosxr.iosxr_command:
         commands:
-          - show configuration
+          - show running-config
+      register: backup_config
+
+    - name: Save configuration to file
+      ansible.builtin.copy:
+        content: "{{ backup_config.stdout[0] }}"
         dest: "{{ playbook_dir }}/startup-configs/{{ inventory_hostname }}.conf"
         # dest_dir: "{{ playbook_dir }}"    # Optional to save a directory
+      delegate_to: localhost
 
 
 # Update passwords workaround for the NETCONF session (which is non-interactive)
