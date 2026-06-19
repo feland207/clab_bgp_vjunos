@@ -1,12 +1,12 @@
 ---
-- name: Interactive Junos Show Command
+- name: Interactive IOS XR Show Command
   hosts: all
-  connection: juniper.device.pyez       # Use ansible.netcommon.netconf module for: junipernetworks.junos.junos
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_prompt:
     - name: user_show_command
-      prompt: "Enter the Junos show command (e.g., show version)"
+      prompt: "Enter the IOS XR show command (e.g., show version)"
       private: no
       default: "show version"
 
@@ -25,19 +25,18 @@
         path: logs
         state: directory
 
-    - name: Run command on Junos devices
-      juniper.device.command:
+    - name: Run command on IOS XR devices
+      cisco.iosxr.iosxr_command:
         commands: "{{ user_show_command }}"
-        formats: "text"
       register: cli_response
 
-    - name: Print command results (Beware it truncates stdout_lines!)
+    - name: Print command results
       ansible.builtin.debug:
-        msg: "{{ cli_response.stdout_lines }}"
+        msg: "{{ cli_response.stdout_lines[0] }}"
 
     - name: Save Full Output to Logs
       ansible.builtin.copy:
-        content: "{{ cli_response.stdout }}"
+        content: "{{ cli_response.stdout[0] }}"
         dest: "./logs/{{ inventory_hostname }}_{{ user_show_command | replace(' ', '_') }}.log"
       delegate_to: localhost
 
