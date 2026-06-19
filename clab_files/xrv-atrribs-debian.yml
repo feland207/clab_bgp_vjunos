@@ -17,7 +17,7 @@ topology:
       kind: cisco_xrv
       mgmt-ipv4: 172.50.50.20
       startup-delay: 60
-      # startup-config: ../startup-configs/R2.conf
+      startup-config: ../startup-configs/R2.conf
       ports:
         - "3002:3000"
 
@@ -25,7 +25,7 @@ topology:
       kind: cisco_xrv
       mgmt-ipv4: 172.50.50.30
       startup-delay: 120
-      # startup-config: ../startup-configs/R3.conf
+      startup-config: ../startup-configs/R3.conf
       ports:
         - "3003:3000"
 

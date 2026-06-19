@@ -77,6 +77,16 @@
         # dest_dir: "{{ playbook_dir }}"    # Optional to save a directory
       delegate_to: localhost
 
+    - name: Strip invalid lines to make it a valid Containerlab boot file
+      delegate_to: localhost
+      ansible.builtin.lineinfile:
+        path: "{{ playbook_dir }}/startup-configs/{{ inventory_hostname }}.conf"
+        state: absent
+        regexp: "{{ item }}"
+      loop:
+        - '^[A-Za-z]{3} [A-Za-z]{3} \d{1,2} \d{2}:\d{2}:\d{2}'  # Deletes the timestamp (e.g., Fri Jun 19 21:19:47...)
+        - '^\s*end\s*$'                                         # Deletes the 'end' command
+        - '^Building configuration'                             # Deletes building config prompt if present
 
 # Update passwords workaround for the NETCONF session (which is non-interactive)
 # Generate a SHA-512 hash (standard for vJunos-switch)
