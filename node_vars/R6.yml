@@ -26,21 +26,22 @@ static_routes:
     action: "discard"
     state: "present"
 
-# Define the routing policies
+# Define the Prefix Sets for RPL
+prefix_sets:
+  - name: "PS-LOCAL-PREFIXES"
+    prefixes:
+      - "10.6.6.0/24"
+      - "10.66.66.0/24"
+
+# Define the Routing Policies
 policies:
   - name: "EXPORT-LOOPBACK"
-    terms:
-      - name: "1"
-        from_protocol: "direct"
-        route_filters:
-          - "10.6.6.0/24 exact"
-          - "10.66.66.0/24 exact"
-        then: "accept"
-
-  - name: "NEXT-HOP-SELF"
-    terms:
-      - name: "1"
-        then: "next-hop self"
+    statements:
+      - condition: "destination in PS-LOCAL-PREFIXES"
+        action: "pass"
+  - name: "PASS-ALL"
+    statements:
+      - action: "pass"
 
 # BGP Overlay Configuration
 bgp:
@@ -48,7 +49,7 @@ bgp:
   groups:
     - name: "IBGP-AS300"
       type: "internal"
-      export_policy: "[ EXPORT-LOOPBACK NEXT-HOP-SELF ]"    # Junos bracket syntax for chaining policies
+      next_hop_self: true
       peers:
       - ip: "5.5.5.5"
         description: "iBGP to R5"
@@ -57,6 +58,7 @@ bgp:
       type: "external"
       peer_as: 200
       export_policy: "EXPORT-LOOPBACK"
+      import_policy: "PASS-ALL"
       peers:
       - ip: "100.100.46.1"
         description: "eBGP to R4"

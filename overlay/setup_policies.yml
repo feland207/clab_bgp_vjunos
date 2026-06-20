@@ -1,7 +1,7 @@
 ---
-- name: "STAGE 2: Implement BGP Overlay"
+- name: "STAGE 2a: Implement Routing Policies (RPL)"
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_files:
@@ -12,30 +12,31 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered Policies configuration
-      ansible.builtin.debug:
-        msg: 
-          - "#--- BGP Policy ---#"
-          - "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
+    - name: PREPARE AND PREVIEW - Render Policies configuration and save locally
+      delegate_to: localhost
+      # Execute only if policies or prefix_sets are defined for this specific node
+      when: policies is defined or prefix_sets is defined
+      block:
+        - name: Save rendered RPL template to /tmp directory
+          ansible.builtin.template:
+            src: "../templates/bgp/rpl_t0.j2"
+            dest: "/tmp/{{ inventory_hostname }}_policies.cfg"
 
-    - name: Configure BGP Settings
-      juniper.device.config:
-        load: "set"
-        format: "set"
-        # Renders the template, splits to list, and drops empty lines to prevent silent failures
-        lines: "{{ lookup('template', '../templates/bgp/policy_options.j2').splitlines() }}"
-        ignore_warning: "statement not found"
-        comment: "Ansible configured routing policies: {{ policies | map(attribute='name') | unique | join(', ') }}"
-        # ignore_warning is to accept the Junos warning gracefully if it tries to delete a config that was already removed in a previous run
-        # ignore_warning: "statement not found"
-        # commit: no  (Defaults to yes)
+        - name: Preview the rendered Policies configuration
+          ansible.builtin.debug:
+            msg: 
+              - "#--- RPL Policies ({{ inventory_hostname }}) ---#"
+              - "{{ lookup('file', '/tmp/{{ inventory_hostname }}_policies.cfg').splitlines() }}"
+
+    - name: Configure Routing Policies (RPL)
+      cisco.iosxr.iosxr_config:
+        src: "/tmp/{{ inventory_hostname }}_policies.cfg"
+        comment: "Ansible: Configured prefix-sets and route-policies"
       register: policy_result
-      when: policies is defined
+      when: policies is defined or prefix_sets is defined
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        # We use {{ item }} to force double interpolation of the variable names
-        var: "{{ item }}"
-      loop:
-        - policy_result.diff_lines
-      when: policy_result.changed
+        var: policy_result.commands
+      # Only show the debug if commands were actually pushed
+      when: policy_result is defined and policy_result.changed

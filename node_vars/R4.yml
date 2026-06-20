@@ -13,6 +13,12 @@ interfaces:
   #   ipv4_address: "100.100.45.1/30"
   #   description: "Link to R5"
 
+# Define the Routing Policies
+policies:
+  - name: "PASS-ALL"
+    statements:
+      - action: "pass"
+
 # BGP Overlay Configuration
 bgp:
   local_as: 200
@@ -20,6 +26,8 @@ bgp:
     - name: "EBGP-AS100"
       type: "external"
       peer_as: 100
+      export_policy: "PASS-ALL"
+      import_policy: "PASS-ALL"
       peers:
       - ip: "100.100.24.1"
         description: "eBGP to R2"
@@ -27,6 +35,8 @@ bgp:
     - name: "EBGP-AS300"
       type: "external"
       peer_as: 300
+      export_policy: "PASS-ALL"
+      import_policy: "PASS-ALL"
       peers:
       - ip: "100.100.46.2"
         description: "eBGP to R6"

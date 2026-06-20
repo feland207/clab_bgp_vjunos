@@ -1,7 +1,7 @@
 ---
-- name: "STAGE 2: Implement BGP Overlay"
+- name: "STAGE 2b: Implement BGP Overlay"
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_files:
@@ -12,27 +12,29 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered BGP configuration
-      ansible.builtin.debug:
-        msg: 
-          - "#--- BGP Overlay ---#"
-          - "{{ lookup('template', '../templates/bgp/base_t0.j2').splitlines() }}"
+    - name: PREPARE AND PREVIEW - Render BGP configuration and save locally
+      delegate_to: localhost
+      when: bgp is defined
+      block:
+        - name: Save rendered BGP template to /tmp directory
+          ansible.builtin.template:
+            src: "../templates/bgp/base_t0.j2"
+            dest: "/tmp/{{ inventory_hostname }}_bgp.cfg"
+
+        - name: Preview the rendered BGP configuration
+          ansible.builtin.debug:
+            msg: 
+              - "#--- BGP Overlay ({{ inventory_hostname }}) ---#"
+              - "{{ lookup('file', '/tmp/{{ inventory_hostname }}_bgp.cfg').splitlines() }}"
 
     - name: Configure BGP Settings
-      juniper.device.config:
-        load: "set"
-        format: "set"
-        # Renders the template, splits to list, and drops empty lines to prevent silent failures
-        lines: "{{ lookup('template', '../templates/bgp/base_t0.j2').splitlines() }}"
-        ignore_warning: "statement not found"
-        comment: "Ansible configured BGP peers in this groups: {{ bgp.groups | map(attribute='name') | unique | join(', ') }}"
-        # commit: no  (Defaults to yes)
+      cisco.iosxr.iosxr_config:
+        src: "/tmp/{{ inventory_hostname }}_bgp.cfg"
+        comment: "Ansible: Configured BGP AS {{ bgp.local_as | default('N/A') }}"
       register: bgp_result
+      when: bgp is defined
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        # We use {{ item }} to force double interpolation of the variable names
-        var: "{{ item }}"
-      loop:
-        - bgp_result.diff_lines
-      when: bgp_result.changed
+        var: bgp_result.commands
+      when: bgp_result is defined and bgp_result.changed

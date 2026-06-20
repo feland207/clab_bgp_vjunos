@@ -15,30 +15,30 @@ interfaces:
     description: "Link to R1"
     ospf_area: "0.0.0.0"
 
-# Define the routing policies
+# Define the Prefix Sets for RPL
+prefix_sets:
+  - name: "PS-LOCAL-PREFIXES"
+    prefixes:
+      - "10.1.1.0/24"
+      - "10.99.99.0/24"
+
+# Define the Routing Policies
 policies:
   - name: "EXPORT-OSPF-TO-EBGP"
-    terms:
-      - name: "1"
-        from_protocol: "ospf"
-        route_filters:
-          - "10.1.1.0/24 exact"
-          - "10.99.99.0/24 exact"
-        # as_path_prepend: "900 900 900"
-        then: "accept"
-
-  - name: "NEXT-HOP-SELF"
-    terms:
-      - name: "1"
-        then: "next-hop self"
+    statements:
+      - condition: "destination in PS-LOCAL-PREFIXES"
+        action: "pass"
+  - name: "PASS-ALL"
+    statements:
+      - action: "pass"
 
 # BGP Overlay Configuration
 bgp:
   local_as: 100
   groups:
-    - name: "IBGP-OVERLAY"
+    - name: "IBGP-AS100"
       type: "internal"
-      export_policy: "NEXT-HOP-SELF"
+      next_hop_self: true
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"
@@ -49,6 +49,7 @@ bgp:
       type: "external"
       peer_as: 300
       export_policy: "EXPORT-OSPF-TO-EBGP"
+      import_policy: "PASS-ALL"
       peers:
       - ip: "100.100.35.2"
         description: "eBGP to R5"

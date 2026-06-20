@@ -1,29 +1,45 @@
-{# Wipe existing BGP configuration to prevent conflicts #}
-delete protocols bgp
-
-{# Global Routing and BGP Settings #}
-set routing-options autonomous-system {{ bgp.local_as }}
-
-{# Iterate through all defined BGP groups #}
+{# IOS XR BGP Global Configuration #}
+{% if bgp is defined %}
+router bgp {{ bgp.local_as }}
+ bgp router-id {{ loopback_ipv4 | ansible.utils.ipaddr('address') }}
+ address-family ipv4 unicast
+ !
+ 
+{# Build the Neighbor Groups #}
+{% if bgp.groups is defined %}
 {% for group in bgp.groups %}
-
-{# Set Group-Level Parameters #}
-set protocols bgp group {{ group.name }} type {{ group.type }}
-
-{# Configure iBGP parameters local-address. For eBGP naturally defaults to the physical P2P IP #}
-{% if group.type == "internal" %}
-set protocols bgp group {{ group.name }} local-address {{ loopback_ipv4.split('/')[0] }}
+ neighbor-group {{ group.name }}
+{% if group.type == 'external' %}
+  remote-as {{ group.peer_as }}
+{% elif group.type == 'internal' %}
+  remote-as {{ bgp.local_as }}
+  update-source Loopback0
+{% endif %}
+  address-family ipv4 unicast
+{% if group.next_hop_self | default(false) | bool %}
+   next-hop-self
+{% endif %}
+{% if group.export_policy is defined %}
+   route-policy {{ group.export_policy }} out
+{% endif %}
+{% if group.import_policy is defined %}
+   route-policy {{ group.import_policy }} in
+{% endif %}
+  !
+ !
+{% endfor %}
 {% endif %}
 
-{# Configure eBGP specific parameters #}
-{% if group.type == "external" %}
-set protocols bgp group {{ group.name }} multihop
-set protocols bgp group {{ group.name }} peer-as {{ group.peer_as }}
-{% endif %}
-
-{# Iterate through the peers within this specific group #}
+{# Attach Physical Peers to the Neighbor Groups #}
+{% if bgp.groups is defined %}
+{% for group in bgp.groups %}
 {% for peer in group.peers %}
-set protocols bgp group {{ group.name }} neighbor {{ peer.ip }} description "{{ peer.description }}"
+ neighbor {{ peer.ip }}
+  use neighbor-group {{ group.name }}
+  description {{ peer.description }}
+ !
 {% endfor %}
-
 {% endfor %}
+{% endif %}
+!
+{% endif %}

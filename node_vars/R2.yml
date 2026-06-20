@@ -20,42 +20,34 @@ static_routes:
     action: "discard"
     state: "absent"
 
-# Define the routing policies
+# Define the Prefix Sets for RPL
+prefix_sets:
+  - name: "PS-LOCAL-PREFIXES"
+    prefixes:
+      - "10.1.1.0/24"
+      - "10.99.99.0/24"
+
+# Define the Routing Policies (RPL format)
 policies:
   - name: "EXPORT-OSPF-TO-EBGP"
-    terms:
-      - name: "1"
-        from_protocol: "ospf"
-        route_filters:
-          - "10.1.1.0/24 exact"
-          - "10.99.99.0/24 exact"
-        then: "accept"
-
+    statements:
+      - condition: "destination in PS-LOCAL-PREFIXES"
+        action: "pass"
   - name: "SET-LOCAL-PREF"
-    terms:
-      - name: "1"
-        from_protocol: "bgp"
-        local_preference: 99
-        then: "accept"
-
-  - name: "EXPORT-AGGREGATE"
-    terms:
-      - name: "1"
-        from_protocol: "aggregate"
-        then: "accept"
-
-  - name: "NEXT-HOP-SELF"
-    terms:
-      - name: "1"
-        then: "next-hop self"
+    statements:
+      - action: "set local-preference 99"
+      - action: "pass"
+  - name: "PASS-ALL"
+    statements:
+      - action: "pass"
 
 # BGP Overlay Configuration
 bgp:
   local_as: 100
   groups:
-    - name: "IBGP-OVERLAY"
+    - name: "IBGP-AS100"
       type: "internal"
-      export_policy: "[ NEXT-HOP-SELF EXPORT-AGGREGATE ]"
+      next_hop_self: true
       peers:
       - ip: "1.1.1.1"
         description: "iBGP to R1"
@@ -65,8 +57,8 @@ bgp:
     - name: "EBGP-AS200"
       type: "external"
       peer_as: 200
-      import_policy: "SET-LOCAL-PREF"
       export_policy: "EXPORT-OSPF-TO-EBGP"
+      import_policy: "SET-LOCAL-PREF"
       peers:
       - ip: "100.100.24.2"
         description: "eBGP to R4"

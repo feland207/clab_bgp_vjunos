@@ -1,0 +1,31 @@
+{# IOS XR Routing Policy Language (RPL) Template #}
+
+{# 1. Generate Prefix Sets #}
+{% if prefix_sets is defined %}
+{% for pset in prefix_sets %}
+prefix-set {{ pset.name }}
+{% for prefix in pset.prefixes %}
+  {{ prefix }}{{ ',' if not loop.last else '' }}
+{% endfor %}
+end-set
+!
+{% endfor %}
+{% endif %}
+
+{# 2. Generate Route Policies #}
+{% if policies is defined %}
+{% for policy in policies %}
+route-policy {{ policy.name }}
+{% for stmt in policy.statements %}
+{% if stmt.condition is defined %}
+  if {{ stmt.condition }} then
+    {{ stmt.action }}
+  endif
+{% else %}
+  {{ stmt.action }}
+{% endif %}
+{% endfor %}
+end-policy
+!
+{% endfor %}
+{% endif %}
