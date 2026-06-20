@@ -12,16 +12,23 @@
       ansible.builtin.include_vars:
         file: "../node_vars/{{ inventory_hostname }}.yml"
 
-    - name: PREVIEW - Show rendered P2P IPv4 configuration
-      ansible.builtin.debug:
-        # Renders the template locally and splits it into a readable list
-        msg: 
-          - "#--- P2P IPv4 ---#"
-          - "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
+    - name: RENDER AND PREVIEW- Show rendered P2P IPv4 configuration and save locally
+      delegate_to: localhost
+      block:
+        - name: Save rendered template to /tmp directory
+          ansible.builtin.template:
+            src: "../templates/p2p_t0.j2"
+            dest: "/tmp/{{ inventory_hostname }}_p2p.cfg"
+
+        - name: Preview the rendered P2P configuration
+          ansible.builtin.debug:
+            msg: 
+              - "#--- P2P IPv4 ({{ inventory_hostname }}) ---#"
+              - "{{ lookup('file', '/tmp/{{ inventory_hostname }}_p2p.cfg').splitlines() }}"
 
     - name: Configure P2P IPv4, Loopbacks and Static Routes
       cisco.iosxr.iosxr_config:
-        src: "../templates/p2p_t0.j2"
+        src: "/tmp/{{ inventory_hostname }}_p2p.cfg"
         comment: "Ansible: Configured P2P IPv4, Loopbacks and Prefixes"
       register: p2p_result
 
