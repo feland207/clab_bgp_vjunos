@@ -1,11 +1,12 @@
 {# Interfaces and Routing Options Template (Cisco IOS XR) #}
 interface Loopback0
  ipv4 address {{ loopback_ipv4 | ansible.utils.ipaddr('address') }} {{ loopback_ipv4 | ansible.utils.ipaddr('netmask') }}
+{% if prefixes is defined %}
 {% for p in prefixes | sort(attribute='prefix') %}
 {% set p_state = 'no ' if p.state | default('present') == 'absent' else '' %}
  {{ p_state }}ipv4 address {{ p.prefix | ansible.utils.ipaddr('address') }} {{ p.prefix | ansible.utils.ipaddr('netmask') }} secondary
 {% endfor %}
- no shutdown
+{% endif %}
 !
 
 {# P2P Interface Settings #}
@@ -18,7 +19,6 @@ interface {{ iface.name }}
 {% else %}
  ipv4 address {{ iface.ipv4_address | ansible.utils.ipaddr('address') }} {{ iface.ipv4_address | ansible.utils.ipaddr('netmask') }}
 {% endif %}
- no shutdown
 !
 {% endfor %}
 {% endif %}

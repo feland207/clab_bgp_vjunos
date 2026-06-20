@@ -26,6 +26,14 @@
               - "#--- P2P IPv4 ({{ inventory_hostname }}) ---#"
               - "{{ lookup('file', '/tmp/{{ inventory_hostname }}_p2p.cfg').splitlines() }}"
 
+    - name: Idempotent - Ensure physical interfaces are enabled (no shutdown) before adding IPv4 addresses
+      cisco.iosxr.iosxr_interfaces:
+        config:
+          - name: "{{ item.name }}"
+            enabled: true
+      loop: "{{ interfaces }}"
+      when: interfaces is defined
+
     - name: Configure P2P IPv4, Loopbacks and Static Routes
       cisco.iosxr.iosxr_config:
         src: "/tmp/{{ inventory_hostname }}_p2p.cfg"
