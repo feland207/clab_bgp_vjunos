@@ -1,11 +1,16 @@
-{# OSPF Protocol Global Settings #}
-set protocols ospf reference-bandwidth 10g
-set protocols ospf lsa-refresh-interval 29
-set protocols ospf area 0.0.0.0 interface lo0.0 passive
-
-{# P2P OSPF interface settings #}
+{# OSPF Protocol Global Settings (Cisco IOS XR) #}
+router ospf 1
+ router-id {{ loopback_ipv4 | ansible.utils.ipaddr('address') }}
+ auto-cost reference-bandwidth 10000
+ area 0.0.0.0
+  interface Loopback0
+   passive enable
+  !
 {% for iface in interfaces %}
 {% if iface.ospf_area is defined %}
-set protocols ospf area {{ iface.ospf_area }} interface {{ iface.name }}.0 interface-type p2p
+  interface {{ iface.name }}
+   network point-to-point
+  !
 {% endif %}
 {% endfor %}
+!

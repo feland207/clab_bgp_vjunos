@@ -1,7 +1,7 @@
 ---
 - name: "STAGE 1: Implement OSPF Underlay"
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_files:
@@ -16,26 +16,24 @@
       ansible.builtin.debug:
         # Renders the template locally and splits it into a readable list
         msg: 
-          - "#--- OSPF Area 0 ---#"
+          - "#--- OSPF Area ---#"
           - "{{ lookup('template', '../templates/ospf/base_t0.j2').splitlines() }}"
 
-    - name: Configure OSPF Area 0
-      juniper.device.config:
-        load: "set"       # set performs a merge operation behind the scenes.
-        format: "set"
-        # We define the loopback address, router-id and ospf protocol
-        # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/ospf/base_t0.j2').splitlines() }}"
-        comment: "Ansible: Configured OSPF Area 0"
-        # commit: no
+    - name: Configure OSPF Area
+      cisco.iosxr.iosxr_config:
+        src: "../templates/ospf/base_t0.j2"
+        comment: "Ansible: Configured OSPF Area"
       register: ospf_result
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        var: "{{ item }}"
-      loop:
-        - ospf_result.diff_lines
-      # Only show the debug if something actually changed
+        var: ospf_result.commands
+      when: ospf_result.changed
+
+    - name: Display Configuration Changes
+      ansible.builtin.debug:
+        var: ospf_result.commands
+      # Only show the debug if commands were actually pushed
       when: ospf_result.changed
 
 # Sanity check
