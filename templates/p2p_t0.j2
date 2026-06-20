@@ -1,6 +1,12 @@
 {# Interfaces and Routing Options Template (Cisco IOS XR) #}
 interface Loopback0
  ipv4 address {{ loopback_ipv4 | ansible.utils.ipaddr('address') }} {{ loopback_ipv4 | ansible.utils.ipaddr('netmask') }}
+{% if prefixes is defined %}
+{% for p in prefixes %}
+{% set p_state = 'no ' if p.state | default('present') == 'absent' else '' %}
+ {{ p_state }}ipv4 address {{ p.prefix | ansible.utils.ipaddr('address') }} {{ p.prefix | ansible.utils.ipaddr('netmask') }} secondary
+{% endfor %}
+{% endif %}
  no shutdown
 !
 
@@ -24,11 +30,9 @@ interface {{ iface.name }}
 router static
  address-family ipv4 unicast
 {% for route in static_routes %}
-{% if route.state | default('present') == 'absent' %}
-  no {{ route.prefix }} {% if route.action == 'discard' %}Null0{% endif %}
-{% else %}
-  {{ route.prefix }} {% if route.action == 'discard' %}Null0{% endif %}
-{% endif %}
+{% set action_suffix = ' Null0' if route.action == 'discard' else '' %}
+{% set state_prefix = 'no ' if route.state | default('present') == 'absent' else '' %}
+  {{ state_prefix }}{{ route.prefix }}{{ action_suffix }}
 {% endfor %}
 !
 {% endif %}
