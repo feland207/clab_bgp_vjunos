@@ -3,20 +3,21 @@ loopback_ipv4: "2.2.2.2/32"
 isis_system_id: "0000.0000.2222"
 
 interfaces:
-  - name: "ge-0/0/0"
+  - name: "GigabitEthernet0/0/0/0"
     ipv4_address: "100.100.24.1/30"
     description: "Link to R4"
-  - name: "ge-0/0/1"
+  - name: "GigabitEthernet0/0/0/1"
     ipv4_address: "100.100.23.1/30"
     description: "Link to R3"
     ospf_area: "0.0.0.0"
-  - name: "ge-0/0/2"
+  - name: "GigabitEthernet0/0/0/2"
     ipv4_address: "100.100.12.2/30"
     description: "Link to R1"
     ospf_area: "0.0.0.0"
 
-aggregate_routes:
+static_routes:
   - prefix: "10.6.6.0/24"
+    action: "discard"
     state: "absent"
 
 # Define the routing policies

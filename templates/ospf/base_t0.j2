@@ -1,3 +1,7 @@
+{# Check if the router has ANY interfaces assigned to an OSPF area #}
+{% set ospf_interfaces = interfaces | default([]) | selectattr('ospf_area', 'defined') | list %}
+
+{% if ospf_interfaces | length > 0 %}
 {# OSPF Protocol Global Settings (Cisco IOS XR) #}
 router ospf 1
  router-id {{ loopback_ipv4 | ansible.utils.ipaddr('address') }}
@@ -10,17 +14,16 @@ router ospf 1
   !
 
 {# Dynamically assign physical interfaces to their defined areas #}
-{% if interfaces is defined %}
-{% for iface in interfaces %}
-{% if iface.ospf_area is defined and iface.ospf_area == '0.0.0.0' %}
+{% for iface in ospf_interfaces %}
+{% if iface.ospf_area == '0.0.0.0' %}
   interface {{ iface.name }}
    network point-to-point
   !
 {% endif %}
 {% endfor %}
-{% endif %}
-{% if interfaces is defined %}
-{% for area, iface_list in interfaces | selectattr('ospf_area', 'defined') | rejectattr('ospf_area', 'equalto', '0.0.0.0') | groupby('ospf_area') %}
+
+{# Dynamically group and assign physical interfaces for any non-backbone areas #}
+{% for area, iface_list in ospf_interfaces | rejectattr('ospf_area', 'equalto', '0.0.0.0') | groupby('ospf_area') %}
  area {{ area }}
 {% for iface in iface_list %}
   interface {{ iface.name }}
@@ -28,5 +31,6 @@ router ospf 1
   !
 {% endfor %}
 {% endfor %}
+!
 {% endif %}
 !

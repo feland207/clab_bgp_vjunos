@@ -1,20 +1,30 @@
 ---
 loopback_ipv4: "6.6.6.6/32"
 isis_system_id: "0000.0000.6666"
-prefixes:
-  - prefix: "10.6.6.6/24"
-    action: "set"
-  - prefix: "10.66.66.66/24"
-    action: "set"
 
 interfaces:
-  - name: "ge-0/0/0"
+  - name: "GigabitEthernet0/0/0/0"
     ipv4_address: "100.100.46.2/30"
     description: "Link to R4"
-  - name: "ge-0/0/1"
+  - name: "GigabitEthernet0/0/0/1"
     ipv4_address: "100.100.56.2/30"
     description: "Link to R5"
     ospf_area: "0.0.0.0"
+
+prefixes:
+  - prefix: "10.6.6.6/32"
+    state: "present"
+  - prefix: "10.66.66.66/32"
+    state: "present"
+
+# Note: IOS XR automatically handles local loopbacks; we only need Null0 discards
+static_routes:
+  - prefix: "10.6.6.0/24"
+    action: "discard"
+    state: "present"
+  - prefix: "10.66.66.0/24"
+    action: "discard"
+    state: "present"
 
 # Define the routing policies
 policies:
