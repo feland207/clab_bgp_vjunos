@@ -1,34 +1,22 @@
 ---
 loopback_ipv4: "1.1.1.1/32"
 isis_system_id: "0000.0000.1111"
-prefixes: 
-  - prefix: "10.1.1.1/24"
-    action: "set"
-  - prefix: "10.99.99.99/24"
-    action: "set"
 
-# static routes definition
+# Note: IOS XR automatically handles local loopbacks; we only need Null0 discards
 static_routes:
   - prefix: "10.1.1.0/24"
     action: "discard"
-    state: "absent"
+    state: "present"
   - prefix: "10.99.99.0/24"
     action: "discard"
-    state: "absent"
-  - prefix: "10.1.1.1/32"
-    action: "receive"
-    state: "absent"
-  - prefix: "10.99.99.99/32"
-    action: "receive"
-    # if state is omitted, it defaults to present and generates a 'set' command
-    state: "absent"
+    state: "present"
 
 interfaces:
-  - name: "ge-0/0/0"
+  - name: "GigabitEthernet0/0/0/0"
     ipv4_address: "100.100.12.1/30"
     description: "Link to R2"
     ospf_area: "0.0.0.0"
-  - name: "ge-0/0/1"
+  - name: "GigabitEthernet0/0/0/1"
     ipv4_address: "100.100.13.1/30"
     description: "Link to R3"
     ospf_area: "0.0.0.0"

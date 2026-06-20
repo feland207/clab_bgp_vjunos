@@ -1,7 +1,7 @@
 ---
 - name: "STAGE 0: Implement P2P interfaces + Prefixes"
   hosts: all
-  connection: juniper.device.pyez
+  connection: ansible.netcommon.network_cli
   gather_facts: no
 
   vars_files:
@@ -19,24 +19,16 @@
           - "#--- P2P IPv4 ---#"
           - "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
 
-    - name: Configure P2P IPv4, Loopbacks and Prefixes
-      juniper.device.config:
-        load: "set"       # Used for set-commands
-        format: "set"     # Needed when using Jinja2 templates with set commands
-        # The 'lookup' renders the file locally and returns a clean string
-        lines: "{{ lookup('template', '../templates/p2p_t0.j2').splitlines() }}"
+    - name: Configure P2P IPv4, Loopbacks and Static Routes
+      cisco.iosxr.iosxr_config:
+        src: "../templates/p2p_t0.j2"
         comment: "Ansible: Configured P2P IPv4, Loopbacks and Prefixes"
-        # ignore_warning is to accept the Junos warning gracefully if it tries to delete a config that was already removed in a previous run
-        ignore_warning: "statement not found"
-        # commit: no
       register: p2p_result
 
     - name: Display Configuration Changes
       ansible.builtin.debug:
-        var: "{{ item }}"
-      loop:
-        - p2p_result.diff_lines
-      # Only show the debug if something actually changed
+        var: p2p_result.commands
+      # Only show the debug if commands were actually pushed
       when: p2p_result.changed
 
 # Sanity check

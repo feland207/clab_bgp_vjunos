@@ -1,53 +1,37 @@
-{# Interfaces and Routing Options Template #}
-set interfaces lo0 unit 0 family inet address {{ loopback_ipv4 }} primary
+{# Interfaces and Routing Options Template (Cisco IOS XR) #}
+interface Loopback0
+ ipv4 address {{ loopback_ipv4 | ansible.utils.ipaddr('address') }} {{ loopback_ipv4 | ansible.utils.ipaddr('netmask') }}
+ no shutdown
+!
 
-{# Adding the target prefixes #}
-{% if prefixes is defined %}
-{% for prefix in prefixes %}
-{{ prefix.action }} interfaces lo0 unit 0 family inet address {{ prefix.prefix }}
-{% endfor %}
-{% endif %}
-
-{# Configure or Delete static routes (Discard / Receive) #}
-{% if static_routes is defined %}
-{% for route in static_routes %}
-
-{# Check if the route is marked for deletion #}
-{% if route.state | default('present') == 'absent' %}
-delete routing-options static route {{ route.prefix }}
-{% else %}
-set routing-options static route {{ route.prefix }} {{ route.action }}
-{% endif %}
-
-{% endfor %}
-{% endif %}
-
-{# Configure or Delete aggregate routes #}
-{% if aggregate_routes is defined %}
-{% for route in aggregate_routes %}
-
-{# Check if the route is marked for deletion #}
-{% if route.state | default('present') == 'absent' %}
-delete routing-options aggregate route {{ route.prefix }}
-{% else %}
-set routing-options aggregate route {{ route.prefix }}
-{% endif %}
-
-{% endfor %}
-{% endif %}
-
-{# P2P interface settings #}
+{# P2P Interface Settings #}
+{% if interfaces is defined %}
 {% for iface in interfaces %}
-set interfaces {{ iface.name }} description "{{ iface.description }}"
-{% if ip_unumbered | bool %}
-set interfaces {{ iface.name }} unit 0 family inet unnumbered-address lo0.0
+interface {{ iface.name }}
+ description {{ iface.description }}
+{% if ip_unumbered | default(false) | bool %}
+ ipv4 unnumbered Loopback0
 {% else %}
-set interfaces {{ iface.name }} unit 0 family inet address {{ iface.ipv4_address }}
+ ipv4 address {{ iface.ipv4_address | ansible.utils.ipaddr('address') }} {{ iface.ipv4_address | ansible.utils.ipaddr('netmask') }}
+{% endif %}
+ no shutdown
+!
+{% endfor %}
+{% endif %}
+
+{# Static Routes (Discards map to Null0) #}
+{% if static_routes is defined and static_routes | length > 0 %}
+router static
+ address-family ipv4 unicast
+{% for route in static_routes %}
+{% if route.state | default('present') == 'absent' %}
+  no {{ route.prefix }} {% if route.action == 'discard' %}Null0{% endif %}
+{% else %}
+  {{ route.prefix }} {% if route.action == 'discard' %}Null0{% endif %}
 {% endif %}
 {% endfor %}
-
-{# Routing Options #}
-set routing-options router-id {{ loopback_ipv4.split('/')[0] }}
+!
+{% endif %}
 
 {#
 Optional use of IP unnumbered.
