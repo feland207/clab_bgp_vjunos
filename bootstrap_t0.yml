@@ -47,6 +47,10 @@
           - username {{ vault_creds.ansible_user }} group root-lr
           - username {{ vault_creds.ansible_user }} secret {{ vault_creds.ansible_password }}
 
+          # Fixing the SSH Idle Timeout
+          - line default exec-timeout 0 0
+          - line default session-timeout 0
+
           # Enable necessary management protocols
           - ssh server v2
           - ssh server netconf vrf clab-mgmt      # Tells SSH to allow NETCONF subsystem

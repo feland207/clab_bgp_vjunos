@@ -30,7 +30,7 @@
     - name: Configure BGP Settings
       cisco.iosxr.iosxr_config:
         src: "/tmp/{{ inventory_hostname }}_bgp.cfg"
-        comment: "Ansible: Configured BGP AS {{ bgp.local_as | default('N/A') }}"
+        label: "Anbl_BGP_AS_{{ bgp.local_as | default('N/A') }}"
       register: bgp_result
       when: bgp is defined
 

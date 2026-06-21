@@ -22,7 +22,7 @@
     - name: Configure OSPF Area
       cisco.iosxr.iosxr_config:
         src: "../templates/ospf/base_t0.j2"
-        comment: "Ansible: Configured OSPF Area"
+        label: "Anbl_OSPF_Area"
       register: ospf_result
 
     - name: Display Configuration Changes

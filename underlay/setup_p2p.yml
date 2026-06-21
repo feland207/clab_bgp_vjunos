@@ -37,7 +37,7 @@
     - name: Configure P2P IPv4, Loopbacks and Static Routes
       cisco.iosxr.iosxr_config:
         src: "/tmp/{{ inventory_hostname }}_p2p.cfg"
-        comment: "Ansible: Configured P2P IPv4, Loopbacks and Prefixes"
+        label: "Anbl_P2P_IPv4"
       register: p2p_result
 
     - name: Display Configuration Changes

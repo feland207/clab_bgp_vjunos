@@ -31,7 +31,7 @@
     - name: Configure Routing Policies (RPL)
       cisco.iosxr.iosxr_config:
         src: "/tmp/{{ inventory_hostname }}_policies.cfg"
-        comment: "Ansible: Configured prefix-sets and route-policies"
+        label: "Anbl_prefixes_and_policies"
       register: policy_result
       when: policies is defined or prefix_sets is defined
 
